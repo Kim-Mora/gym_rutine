@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Mensual — Regreso al Gym</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161921;
+    --card: #1e222d;
+    --border: #2a2f3e;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --accent3: #47c8ff;
+    --text: #e8ecf4;
+    --muted: #6b7280;
+    --danger: #ff4757;
+    --success: #2ed573;
+    --w1: #ff6b35;
+    --w2: #ffa726;
+    --w3: #47c8ff;
+    --w4: #9b59b6;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d0f14 0%, #1a1f2e 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 32px 24px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: 'FASE 1';
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 120px;
+    font-weight: 900;
+    color: rgba(232,255,71,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  h1 span { color: var(--accent); }
+  .header-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  .badge.accent { border-color: var(--accent); color: var(--accent); }
+  .badge.orange { border-color: var(--accent2); color: var(--accent2); }
+  .badge.blue { border-color: var(--accent3); color: var(--accent3); }
+
+  /* WEEK TABS */
+  .week-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .week-tabs::-webkit-scrollbar { display: none; }
+  .week-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 14px 8px;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .week-tab:hover { color: var(--text); }
+  .week-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .week-tab .week-label { display: block; font-size: 10px; letter-spacing: 2px; font-weight: 400; margin-bottom: 2px; }
+  .w1.active { border-bottom-color: var(--w1); color: var(--w1); }
+  .w2.active { border-bottom-color: var(--w2); color: var(--w2); }
+  .w3.active { border-bottom-color: var(--w3); color: var(--w3); }
+  .w4.active { border-bottom-color: var(--w4); color: var(--w4); }
+
+  /* MAIN */
+  main { padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+
+  /* WEEK PANEL */
+  .week-panel { display: none; }
+  .week-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* WEEK HEADER CARD */
+  .week-overview {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .week-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .week-desc { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .intensity-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* WEEKLY SCHEDULE */
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .day-card:hover { border-color: var(--muted); }
+  .day-card.rest { opacity: 0.5; }
+  .day-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .day-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .day-type {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .type-upper { background: rgba(71,200,255,0.15); color: var(--accent3); }
+  .type-lower { background: rgba(255,107,53,0.15); color: var(--accent2); }
+  .type-cardio { background: rgba(46,213,115,0.15); color: var(--success); }
+  .type-rest { background: rgba(107,114,128,0.1); color: var(--muted); }
+  .day-body { padding: 10px 14px; }
+  .day-workout { font-size: 13px; color: var(--text); }
+  .day-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .time-chips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .time-chip {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* WORKOUT TABLES */
+  .workout-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .workout-block-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .workout-block-header:hover { background: rgba(255,255,255,0.02); }
+  .wb-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+  .wb-chevron { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
+  .workout-block.collapsed .wb-chevron { transform: rotate(-90deg); }
+  .workout-block.collapsed .workout-table-wrap { display: none; }
+
+  .workout-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 500px; }
+  thead tr { background: var(--surface); }
+  th {
+    padding: 8px 12px;
+    text-align: left;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(42,47,62,0.5);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  .exercise-name { font-weight: 500; }
+  .weight-cell { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; color: var(--accent3); }
+  .sets-cell { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; }
+  .target-cell {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .target-fallo { background: rgba(255,71,87,0.15); color: var(--danger); }
+  .target-rir1 { background: rgba(255,107,53,0.15); color: var(--accent2); }
+  .target-rir2 { background: rgba(255,167,38,0.15); color: #ffa726; }
+  .target-descarga { background: rgba(155,89,182,0.15); color: var(--w4); }
+  .note-cell { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* CARDIO BLOCK */
+  .cardio-card {
+    background: linear-gradient(135deg, rgba(46,213,115,0.08) 0%, var(--card) 100%);
+    border: 1px solid rgba(46,213,115,0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .cardio-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--success);
+    margin-bottom: 10px;
+  }
+  .cardio-rows { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cardio-item {
+    background: var(--surface);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .cardio-item strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--success); }
+
+  /* PROGRESSION BOX */
+  .progression-box {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .progression-box.orange { border-left-color: var(--accent2); }
+  .progression-box.blue { border-left-color: var(--accent3); }
+  .progression-box.purple { border-left-color: var(--w4); }
+  .pb-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .pb-items { color: var(--muted); line-height: 1.7; }
+  .pb-items b { color: var(--text); }
+
+  /* TIPS */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .tip-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+  .tip-icon { font-size: 20px; margin-bottom: 6px; }
+  .tip-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
+  .tip-text { color: var(--muted); line-height: 1.5; }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* OVERVIEW TABLE */
+  .month-overview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 600px) { .month-overview { grid-template-columns: repeat(2,1fr); } }
+  .mo-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mo-card:hover { transform: translateY(-2px); }
+  .mo-week { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .mo-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; text-transform: uppercase; margin: 4px 0; }
+  .mo-desc { font-size: 11px; color: var(--muted); }
+  .mo-bar { height: 3px; border-radius: 2px; margin-top: 10px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 500px) {
+    .week-overview { grid-template-columns: 1fr; }
+    .schedule-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate" style="
+  position:fixed; inset:0; z-index:9999;
+  background:#0d0f14;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:20px; padding:24px;
+">
+  <div style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:3px; color:#6b7280; text-transform:uppercase;">Plan Mensual</div>
+  <div style="font-family:'Barlow Condensed',sans-serif; font-size:36px; font-weight:900; color:#e8ecf4; text-transform:uppercase; letter-spacing:-0.5px;">Acceso <span style="color:#e8ff47">privado</span></div>
+  <input
+    id="gate-input"
+    type="password"
+    placeholder="Contraseña"
+    onkeydown="if(event.key==='Enter') checkPass()"
+    style="
+      background:#1e222d; border:1px solid #2a2f3e;
+      border-radius:6px; color:#e8ecf4;
+      padding:12px 16px; font-family:'Barlow',sans-serif;
+      font-size:15px; outline:none; width:100%; max-width:280px;
+      text-align:center; letter-spacing:3px;
+    "
+  >
+  <button onclick="checkPass()" style="
+    background:#e8ff47; color:#0d0f14;
+    border:none; border-radius:6px;
+    padding:11px 32px; font-family:'Barlow Condensed',sans-serif;
+    font-size:15px; font-weight:700; letter-spacing:1px;
+    text-transform:uppercase; cursor:pointer; width:100%; max-width:280px;
+  ">Entrar</button>
+  <div id="gate-error" style="color:#ff4757; font-size:13px; min-height:18px;"></div>
+</div>
+
+<script>
+  // Cambia 'mipass123' por la contraseña que quieras
+  const PASS = 'mipass123';
+  const SESSION_KEY = 'gym-auth';
+
+  function checkPass() {
+    const val = document.getElementById('gate-input').value;
+    if (val === PASS) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('gate').style.display = 'none';
+    } else {
+      const err = document.getElementById('gate-error');
+      err.textContent = 'Contraseña incorrecta';
+      document.getElementById('gate-input').value = '';
+      setTimeout(() => err.textContent = '', 2000);
+    }
+  }
+
+  // Si ya autenticó en esta sesión, ocultar gate directo
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    document.getElementById('gate').style.display = 'none';
+  }
+</script>
+
+<header>
+  <div class="header-tag">Programa de reactivación</div>
+  <h1>Plan <span>Mensual</span><br>Regreso al Gym</h1>
+  <div class="header-sub">Upper/Lower · 4 días/semana · ~1 hora por sesión · 15 min cardio incluido</div>
+  <div class="badges">
+    <span class="badge accent">Upper/Lower Split</span>
+    <span class="badge orange">Progresión al Fallo</span>
+    <span class="badge blue">Cardio integrado</span>
+    <span class="badge">6 meses pausa</span>
+  </div>
+</header>
+
+<!-- WEEK TABS -->
+<div class="week-tabs">
+  <div class="week-tab w1 active" onclick="showWeek(1)">
+    <span class="week-label">Semana</span> 1
+  </div>
+  <div class="week-tab w2" onclick="showWeek(2)">
+    <span class="week-label">Semana</span> 2
+  </div>
+  <div class="week-tab w3" onclick="showWeek(3)">
+    <span class="week-label">Semana</span> 3
+  </div>
+  <div class="week-tab w4" onclick="showWeek(4)">
+    <span class="week-label">Semana</span> 4
+  </div>
+  <div class="week-tab" onclick="showWeek(0)">
+    <span class="week-label">Vista</span> General
+  </div>
+  <div class="week-tab" onclick="showWeek(5)" style="color:var(--accent)">
+    <span class="week-label">📋</span> Registro
+  </div>
+</div>
+
+<main>
+
+<!-- ===================== VISTA GENERAL ===================== -->
+<div class="week-panel" id="panel-0">
+  <div class="section-title">Resumen del Mesociclo</div>
+  <div class="month-overview">
+    <div class="mo-card" onclick="showWeek(1)">
+      <div class="mo-week">Semana 1</div>
+      <div class="mo-name" style="color:var(--w1)">Activación</div>
+      <div class="mo-desc">RIR 2-3 · Cargas al 70-75%<br>Reaprender patrones</div>
+      <div class="mo-bar" style="background:var(--w1); width:40%"></div>
+    </div>
+    <div class="mo-card" onclick="showWeek(2)">
+      <div class="mo-week">Semana 2</div>
+      <div class="mo-name" style="color:var(--w2)">Acumulación</div>
+      <div class="mo-desc">RIR 1-2 · Cargas del plan<br>Volumen completo</div>
+      <div class="mo-bar" style="background:var(--w2); width:65%"></div>
+    </div>
+    <div class="mo-card" onclick="showWeek(3)">
+      <div class="mo-week">Semana 3</div>
+      <div class="mo-name" style="color:var(--w3)">Alta intensidad</div>
+      <div class="mo-desc">Fallo / RIR 1<br>Máxima estimulación</div>
+      <div class="mo-bar" style="background:var(--w3); width:90%"></div>
+    </div>
+    <div class="mo-card" onclick="showWeek(4)">
+      <div class="mo-week">Semana 4</div>
+      <div class="mo-name" style="color:var(--w4)">Descarga</div>
+      <div class="mo-desc">RIR 3-4 · 60% carga<br>Recuperación activa</div>
+      <div class="mo-bar" style="background:var(--w4); width:30%"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> Fallo (0 RIR)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div> RIR 1</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffa726"></div> RIR 2</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--w4)"></div> Descarga</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent3)"></div> Peso sugerido</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div> Cardio</div>
+  </div>
+
+  <div class="section-title">Estructura semanal tipo</div>
+  <div class="schedule-grid">
+    <div class="day-card"><div class="day-header"><span class="day-name">Lunes</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Upper 1</div><div class="day-note">Pecho / Espalda / Hombros / Brazos</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Martes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Lower 1</div><div class="day-note">Femoral / Quad / Glúteo / Pantorrilla</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card rest"><div class="day-header"><span class="day-name">Miércoles</span><span class="day-type type-rest">Descanso</span></div><div class="day-body"><div class="day-workout">Recuperación</div><div class="day-note">Caminar opcional 20-30 min</div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Jueves</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Upper 2</div><div class="day-note">Espalda / Pecho máq. / Tríceps / Bíceps</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Viernes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Lower 2</div><div class="day-note">Quad / Femoral / Glúteo / Costurera</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card rest"><div class="day-header"><span class="day-name">Sáb / Dom</span><span class="day-type type-rest">Descanso</span></div><div class="day-body"><div class="day-workout">Recuperación</div><div class="day-note">Paseos, movilidad o nada</div></div></div>
+  </div>
+
+  <div class="section-title">Protocolo de cardio</div>
+  <div class="cardio-card">
+    <div class="cardio-title">🏃 15 minutos al final de cada sesión</div>
+    <div class="cardio-rows">
+      <div class="cardio-item"><strong>Sem 1-2</strong>Caminata inclinada 6-8% · ritmo moderado · FC ~120-130</div>
+      <div class="cardio-item"><strong>Sem 3</strong>Intervalos ligeros · 1 min trotar / 1 min caminar · x7</div>
+      <div class="cardio-item"><strong>Sem 4 (descarga)</strong>Caminata suave 10 min · FC ~100-110 · recuperación activa</div>
+    </div>
+  </div>
+
+  <div class="section-title">Tips clave para el regreso</div>
+  <div class="tips-grid">
+    <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-title">Semana 1: sin ego</div><div class="tip-text">Aunque la calistenia mantuvo tu base, las cargas libres y máquinas se sienten diferentes. Usa los pesos sugeridos como punto de partida conservador.</div></div>
+    <div class="tip-card"><div class="tip-icon">🎯</div><div class="tip-title">RIR real</div><div class="tip-text">RIR = Reps In Reserve. RIR 2 significa que podrías hacer 2 reps más pero paras. Sem 1 sobra margen, Sem 3 llegas al fallo o casi.</div></div>
+    <div class="tip-card"><div class="tip-icon">🕐</div><div class="tip-title">Tiempo en el gym</div><div class="tip-text">Descansa 90-120 seg entre series en pesos compuestos, 60-75 seg en aislamiento. Con eso cabes en 45 min de pesas + 15 min cardio.</div></div>
+    <div class="tip-card"><div class="tip-icon">🍽️</div><div class="tip-title">Déficit calórico</div><div class="tip-text">El cardio ayuda, pero la pérdida de peso ocurre en la cocina. Mantén el plan de equivalentes de tu nutrióloga durante todo el mesociclo.</div></div>
+    <div class="tip-card"><div class="tip-icon">😴</div><div class="tip-title">DOMS sem 1-2</div><div class="tip-text">Espera agujetas fuertes los primeros días. Son normales por el retorno. El calor, estirar y proteína adecuada ayudan a recuperarse.</div></div>
+    <div class="tip-card"><div class="tip-icon">🔄</div><div class="tip-title">Progresión siguiente mes</div><div class="tip-text">Al terminar la descarga, el mes 2 repite la estructura subiendo cargas ~5-10% en ejercicios donde llegaste cómodo al fallo.</div></div>
+  </div>
+</div>
+
+<!-- ===================== SEMANA 1 ===================== -->
+<div class="week-panel active" id="panel-1">
+  <div class="week-overview">
+    <div>
+      <div class="week-title" style="color:var(--w1)">Semana 1 — Activación</div>
+      <div class="week-desc">Readaptación neuromuscular · Aprender las cargas · Sin llevar al fallo · El objetivo es que el músculo recuerde los patrones de movimiento</div>
+    </div>
+    <span class="intensity-pill" style="background:rgba(255,107,53,0.15); color:var(--w1)">RIR 2-3</span>
+  </div>
+
+  <div class="progression-box orange">
+    <div class="pb-title">🎯 Estrategia semana 1</div>
+    <div class="pb-items">
+      <b>Cargas:</b> Usa los pesos sugeridos pero baja un 20-25% (ej. si dice 150kg, empieza en 115-120kg)<br>
+      <b>Objetivo:</b> Completar todas las series sin fallo, sentir el músculo trabajar<br>
+      <b>Cardio:</b> Caminata inclinada 15 min al finalizar (6% inclinación, ritmo conversacional)<br>
+      <b>Aviso:</b> Habrá agujetas fuertes del día 2-3 en adelante — es completamente normal
+    </div>
+  </div>
+
+  <div class="section-title">Lunes — Upper 1</div>
+  <div class="workout-block" id="u1w1">
+    <div class="workout-block-header" onclick="toggleBlock('u1w1')">
+      <span class="wb-title">Upper 1 · Pecho / Espalda / Hombros / Brazos</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x15, 100x12</td><td class="sets-cell">150x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Paras con 3 reps en el tanque</td></tr>
+          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12</td><td class="sets-cell">115x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Controla la bajada 2 seg</td></tr>
+          <tr><td>3</td><td class="exercise-name">Jalón al pecho cerrado</td><td class="weight-cell">75x10, 90x10</td><td class="sets-cell">100x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Retracción escapular completa</td></tr>
+          <tr><td>4</td><td class="exercise-name">Press Militar (máq.)</td><td class="weight-cell">D45x12</td><td class="sets-cell">55x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Rango completo sin arquear</td></tr>
+          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">20x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Ligero, sentir el deltoide</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">80x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Bíceps en estiramiento completo</td></tr>
+          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">20x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Sentir el pico del bíceps</td></tr>
+          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">120x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Trícep largo, codos atrás</td></tr>
+          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Checar · 2x10</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Trapecio, peso muy ligero</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cardio-card">
+    <div class="cardio-title">🏃 Cardio post-entreno · 15 min</div>
+    <div class="cardio-rows">
+      <div class="cardio-item"><strong>Tipo</strong>Caminata inclinada</div>
+      <div class="cardio-item"><strong>Intensidad</strong>6% · ritmo conversacional</div>
+      <div class="cardio-item"><strong>FC objetivo</strong>~120-130 bpm</div>
+      <div class="cardio-item"><strong>Tiempo total</strong>~60 min sesión</div>
+    </div>
+  </div>
+
+  <div class="section-title">Martes — Lower 1</div>
+  <div class="workout-block" id="l1w1">
+    <div class="workout-block-header" onclick="toggleBlock('l1w1')">
+      <span class="wb-title">Lower 1 · Femoral / Quad / Glúteo / Pantorrilla</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Siente el femoral en la bajada</td></tr>
+          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Rango completo, sin rebote</td></tr>
+          <tr><td>3</td><td class="exercise-name">Extensiones (quad)</td><td class="weight-cell">85x15, 100x12</td><td class="sets-cell">130x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pico de contracción 1 seg arriba</td></tr>
+          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Determinar ligero</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Técnica > peso en sem 1</td></tr>
+          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pausa en cierre 1 seg</td></tr>
+          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Contracción máxima arriba</td></tr>
+          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">240x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Rango completo, talón abajo</td></tr>
+          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Siente la tensión en toda la pierna</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cardio-card">
+    <div class="cardio-title">🏃 Cardio post-entreno · 15 min</div>
+    <div class="cardio-rows">
+      <div class="cardio-item"><strong>Tipo</strong>Bici estática o elíptica</div>
+      <div class="cardio-item"><strong>Intensidad</strong>Nivel bajo · ritmo cómodo</div>
+      <div class="cardio-item"><strong>FC objetivo</strong>~115-125 bpm</div>
+      <div class="cardio-item"><strong>Nota</strong>Piernas ya fatigadas, cardio suave</div>
+    </div>
+  </div>
+
+  <div class="section-title">Jueves — Upper 2</div>
+  <div class="workout-block" id="u2w1">
+    <div class="workout-block-header" onclick="toggleBlock('u2w1')">
+      <span class="wb-title">Upper 2 · Espalda / Pecho / Hombros / Tríceps / Bíceps</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Dominadas (asistidas)</td><td class="weight-cell">-70x8</td><td class="sets-cell">-55x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">La calistenia ayuda aquí</td></tr>
+          <tr><td>2</td><td class="exercise-name">Remo máq. discos</td><td class="weight-cell">80x10</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Codos pegados al cuerpo</td></tr>
+          <tr><td>3</td><td class="exercise-name">Press pecho máq.</td><td class="weight-cell">75x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo pecho de la semana, bajar %</td></tr>
+          <tr><td>4</td><td class="exercise-name">Elevación lateral máq.</td><td class="weight-cell">40x10, 55x10</td><td class="sets-cell">55x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Sin trampa, no subas el hombro</td></tr>
+          <tr><td>5</td><td class="exercise-name">Fondos máq.</td><td class="weight-cell">—</td><td class="sets-cell">120x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo tríceps, cuidado el codo</td></tr>
+          <tr><td>6</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">20x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Ligero, a lo largo de la semana</td></tr>
+          <tr><td>7</td><td class="exercise-name">Espalda baja en banco</td><td class="weight-cell">—</td><td class="sets-cell">2x10</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Hiperextensión, peso corporal</td></tr>
+          <tr><td>8</td><td class="exercise-name">Peck Deck Reverso</td><td class="weight-cell">55x10, 90x10</td><td class="sets-cell">90x9 · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Deltoides posterior, crucial</td></tr>
+          <tr><td>9</td><td class="exercise-name">Predicador Inverso</td><td class="weight-cell">55x10</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Bíceps, cabeza corta</td></tr>
+          <tr><td>10</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">80x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Tercer bíceps, bajar peso</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Viernes — Lower 2</div>
+  <div class="workout-block" id="l2w1">
+    <div class="workout-block-header" onclick="toggleBlock('l2w1')">
+      <span class="wb-title">Lower 2 · Quad / Femoral / Glúteo / Costurera</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Extensiones (quad)</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">140x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo quad, igual cuidado</td></tr>
+          <tr><td>2</td><td class="exercise-name">Press Horizontal (femoral)</td><td class="weight-cell">145x15, 175x12</td><td class="sets-cell">200x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Prensa inclinada orientada al femoral</td></tr>
+          <tr><td>3</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo curl acostado</td></tr>
+          <tr><td>4</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">90x9 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Femoral en estiramiento máximo</td></tr>
+          <tr><td>5</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Glúteo, empuje desde el talón</td></tr>
+          <tr><td>6</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">240x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo pantorrilla sem</td></tr>
+          <tr><td>7</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Músculo raro, fluye con él</td></tr>
+          <tr><td>8</td><td class="exercise-name">Abductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pausa al abrir</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SEMANA 2 ===================== -->
+<div class="week-panel" id="panel-2">
+  <div class="week-overview">
+    <div>
+      <div class="week-title" style="color:var(--w2)">Semana 2 — Acumulación</div>
+      <div class="week-desc">Cargas del plan original · Series al RIR 1-2 · Volumen completo · Ya deberías saber qué peso usar en cada ejercicio</div>
+    </div>
+    <span class="intensity-pill" style="background:rgba(255,167,38,0.15); color:var(--w2)">RIR 1-2</span>
+  </div>
+
+  <div class="progression-box" style="border-left-color:var(--w2)">
+    <div class="pb-title">🎯 Estrategia semana 2</div>
+    <div class="pb-items">
+      <b>Cargas:</b> Usa exactamente los pesos sugeridos en el plan (los que aparecen entre paréntesis son el objetivo, usa los anteriores)<br>
+      <b>Objetivo:</b> Series efectivas al RIR 1-2 — una rep más y podrías fallar, pero no fallas<br>
+      <b>Ajuste:</b> Si sem 1 fue muy fácil, sube 5-10% en algunos ejercicios<br>
+      <b>Cardio:</b> Mantén caminata inclinada, sube a 8% o añade ligera velocidad
+    </div>
+  </div>
+
+  <div class="section-title">Lunes — Upper 1</div>
+  <div class="workout-block" id="u1w2">
+    <div class="workout-block-header" onclick="toggleBlock('u1w2')">
+      <span class="wb-title">Upper 1 · Pecho / Espalda / Hombros / Brazos</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12</td><td class="sets-cell">150x10x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 180 a futuro</td></tr>
+          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 145 a futuro</td></tr>
+          <tr><td>3</td><td class="exercise-name">Jalón al pecho cerrado</td><td class="weight-cell">75x10, 90x10</td><td class="sets-cell">110x10x8 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 120</td></tr>
+          <tr><td>4</td><td class="exercise-name">Press Militar (máq.)</td><td class="weight-cell">D45x12</td><td class="sets-cell">55x12x9 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 70</td></tr>
+          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">25x10x10x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 35</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">85x10, 90x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 105</td></tr>
+          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">25x12 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 40</td></tr>
+          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 160</td></tr>
+          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Checar · 2x10</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Ya sabes el peso de sem 1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Martes — Lower 1</div>
+  <div class="workout-block" id="l1w2">
+    <div class="workout-block-header" onclick="toggleBlock('l1w2')">
+      <span class="wb-title">Lower 1 · Femoral / Quad / Glúteo / Pantorrilla</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">110x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 120-125</td></tr>
+          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">100x9 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 110-115</td></tr>
+          <tr><td>3</td><td class="exercise-name">Extensiones</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">145x12 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 160</td></tr>
+          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Peso sem 1</td><td class="sets-cell">+5-10% sem 1 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Ya tienes referencia</td></tr>
+          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Pausa en cierre</td></tr>
+          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Contraer glúteo al máximo</td></tr>
+          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">250x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 265-270</td></tr>
+          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">150x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 165-175</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Jueves — Upper 2 &nbsp; / &nbsp; Viernes — Lower 2</div>
+  <div class="progression-box" style="border-left-color:var(--w2)">
+    <div class="pb-title">Upper 2 y Lower 2 — Sem 2</div>
+    <div class="pb-items">
+      Misma estructura que la semana 1 para Upper 2 y Lower 2, pero <b>subiendo los pesos un 5-10%</b> respecto a lo que usaste sem 1.<br>
+      Aplica <b>RIR 1-2</b> en todas las series efectivas. Sientes que podrías hacer 1-2 reps más, pero paras ahí.<br>
+      El cardio post-entreno se mantiene: <b>15 min de caminata inclinada a 8%</b> o bici nivel moderado para Lower.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SEMANA 3 ===================== -->
+<div class="week-panel" id="panel-3">
+  <div class="week-overview">
+    <div>
+      <div class="week-title" style="color:var(--w3)">Semana 3 — Alta Intensidad</div>
+      <div class="week-desc">Fallo muscular en ejercicios de aislamiento · RIR 1 en compuestos · Pesos sugeridos del plan o más · Máxima estimulación</div>
+    </div>
+    <span class="intensity-pill" style="background:rgba(71,200,255,0.15); color:var(--w3)">FALLO / RIR 1</span>
+  </div>
+
+  <div class="progression-box blue">
+    <div class="pb-title">🎯 Estrategia semana 3</div>
+    <div class="pb-items">
+      <b>Aislamientos (curl, extensiones, elevaciones, costurera, abductores, etc.):</b> Llegar al fallo completo. No hay rep más.<br>
+      <b>Compuestos (jalón, press, sentadilla, dominadas, remo):</b> RIR 1 — una rep antes del fallo.<br>
+      <b>Pesos:</b> Usa los valores objetivo (en paréntesis) si los alcanzaste, o el peso de sem 2 si no.<br>
+      <b>Cardio:</b> Intervalos ligeros 15 min (1 min trotar / 1 min caminar x7) — quema más calorías post-fatigado.<br>
+      <b>Advertencia:</b> Las agujetas de esta semana serán las peores. Duerme bien, proteína alta.
+    </div>
+  </div>
+
+  <div class="section-title">Lunes — Upper 1 (Fallo / RIR 1)</div>
+  <div class="workout-block" id="u1w3">
+    <div class="workout-block-header" onclick="toggleBlock('u1w3')">
+      <span class="wb-title">Upper 1 · Semana de máxima intensidad</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12, 150x10</td><td class="sets-cell">150x10x10 (o +)</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Última rep no puedes más</td></tr>
+          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115-145x6-8</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 rep antes fallo</td></tr>
+          <tr><td>3</td><td class="exercise-name">Jalón cerrado</td><td class="weight-cell">75x10, 90x10, 110x10</td><td class="sets-cell">110-120x8 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Espalda compuesto, RIR 1</td></tr>
+          <tr><td>4</td><td class="exercise-name">Press Militar</td><td class="weight-cell">D45x12, 55x12</td><td class="sets-cell">55-70x9 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Hombro compuesto, RIR 1</td></tr>
+          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">25-35x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, al límite</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10, 85x10</td><td class="sets-cell">90-105x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Bíceps al fallo total</td></tr>
+          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">25-40x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Segundo bíceps, fallo</td></tr>
+          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">140-160x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Tríceps al límite</td></tr>
+          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · 2x10 fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Trapecio al fallo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Martes — Lower 1 (Fallo / RIR 1)</div>
+  <div class="workout-block" id="l1w3">
+    <div class="workout-block-header" onclick="toggleBlock('l1w3')">
+      <span class="wb-title">Lower 1 · Semana de máxima intensidad</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12, 110x10</td><td class="sets-cell">110-125x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Fallo completo en femoral</td></tr>
+          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10, 100x9</td><td class="sets-cell">100-115x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Segundo fallo femoral</td></tr>
+          <tr><td>3</td><td class="exercise-name">Extensiones</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">145-160x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Quad aislamiento, fallo</td></tr>
+          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Peso sem 2</td><td class="sets-cell">+5% sem 2 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 antes fallo</td></tr>
+          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 2 · fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, fallo total</td></tr>
+          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 2 · fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Glúteo al límite</td></tr>
+          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10, 250x10</td><td class="sets-cell">250-270x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Pantorrilla aguanta mucho</td></tr>
+          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">150-175x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Fallo en costurera</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Jueves — Upper 2 &nbsp;/&nbsp; Viernes — Lower 2</div>
+  <div class="progression-box blue">
+    <div class="pb-title">Upper 2 y Lower 2 — Sem 3</div>
+    <div class="pb-items">
+      Misma lógica: <b>aislamientos al fallo</b> (elevaciones laterales, curl acostado, costurera, abductores, peck deck reverso, predicador).<br>
+      <b>Compuestos al RIR 1</b> (dominadas, remo, press pecho, fondos, sentadilla, press pantorrilla).<br>
+      El cardio esta semana: <b>intervalos 15 min</b> — 1 min a ritmo ligero de trote / 1 min caminata x7 repeticiones.<br>
+      <b>Recuperación crítica:</b> duerme 7-8 h, hidratación alta, proteína ~1.8-2g/kg.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SEMANA 4 ===================== -->
+<div class="week-panel" id="panel-4">
+  <div class="week-overview">
+    <div>
+      <div class="week-title" style="color:var(--w4)">Semana 4 — Descarga</div>
+      <div class="week-desc">Recuperación activa · 60% del peso de sem 3 · Volumen reducido a la mitad · El músculo consolida adaptaciones · Preparación para el mes 2</div>
+    </div>
+    <span class="intensity-pill" style="background:rgba(155,89,182,0.15); color:var(--w4)">DESCARGA</span>
+  </div>
+
+  <div class="progression-box purple">
+    <div class="pb-title">🎯 Estrategia semana 4 — Descarga</div>
+    <div class="pb-items">
+      <b>Cargas:</b> 55-60% del peso que usaste en sem 3 (ej. si hiciste 150 en sem 3, usa 85-90 esta semana)<br>
+      <b>Series:</b> Solo 1 serie por ejercicio · La mitad del volumen total<br>
+      <b>Reps:</b> 8-10 reps con mucho margen (RIR 4-5) — nunca llegas al fallo<br>
+      <b>Objetivo:</b> Sentirte fresco, mover sangre a los músculos, reducir inflamación acumulada<br>
+      <b>Cardio:</b> Caminata suave 10-12 min a ritmo muy cómodo — sin esfuerzo cardiovascular alto<br>
+      <b>Mentalidad:</b> Esta semana parece "fácil" pero es donde el músculo realmente crece y se adapta
+    </div>
+  </div>
+
+  <div class="section-title">Estructura de descarga — todas las sesiones</div>
+  <div class="workout-block" id="desc_all">
+    <div class="workout-block-header" onclick="toggleBlock('desc_all')">
+      <span class="wb-title">Upper 1 / Lower 1 / Upper 2 / Lower 2 — Versión Descarga</span>
+      <span class="wb-chevron">▼</span>
+    </div>
+    <div class="workout-table-wrap">
+      <table>
+        <thead><tr><th>Sesión</th><th>Ejercicio</th><th>Peso descarga</th><th>Series × Reps</th><th>Intensidad</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Upper 1<br>(Lunes)</td>
+              <td>Peck Deck</td><td class="weight-cell">~90x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Press Máq. Pecho</td><td class="weight-cell">~70x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Jalón cerrado</td><td class="weight-cell">~65x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Predicador + Fondos</td><td class="weight-cell">~55% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Lower 1<br>(Martes)</td>
+              <td>Curl acostado + sentado</td><td class="weight-cell">~65-70% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Extensiones</td><td class="weight-cell">~85x12</td><td>1×12</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Sentadilla Hack</td><td class="weight-cell">~60% sem3</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Puente glúteo + Costurera</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="3" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Upper 2<br>(Jueves)</td>
+              <td>Dominadas + Remo</td><td class="weight-cell">-70x8 / 65x10</td><td>1×8 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Elev. lateral + Peck Deck Reverso</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Predicador + Predicador Inv.</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="3" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Lower 2<br>(Viernes)</td>
+              <td>Extensiones + Press Hor.</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Curl acostado + sentado</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Puente glúteo + Costurera + Abductores</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cardio-card" style="background:linear-gradient(135deg, rgba(155,89,182,0.08) 0%, var(--card) 100%); border-color:rgba(155,89,182,0.2)">
+    <div class="cardio-title" style="color:var(--w4)">🚶 Cardio descarga — 10-12 min post-sesión</div>
+    <div class="cardio-rows">
+      <div class="cardio-item"><strong>Tipo</strong>Caminata plana o inclinación mínima (3%)</div>
+      <div class="cardio-item"><strong>Intensidad</strong>Muy baja · FC ~100-110 bpm</div>
+      <div class="cardio-item"><strong>Objetivo</strong>Flujo sanguíneo, no quemar calorías</div>
+      <div class="cardio-item"><strong>Extra</strong>Estiramientos 5 min al final</div>
+    </div>
+  </div>
+
+  <div class="section-title">¿Qué sigue después de la descarga?</div>
+  <div class="progression-box purple">
+    <div class="pb-title">Inicio del Mes 2 — Cómo progresar</div>
+    <div class="pb-items">
+      Al terminar sem 4, tu cuerpo estará completamente recuperado y súper-compensado.<br>
+      <b>Mes 2:</b> Repite la misma estructura de 4 semanas, pero con estas progresiones:<br>
+      · <b>Ejercicios donde llegaste bien al fallo:</b> Sube 5 kg (máq.) o 2.5 kg (mancuernas)<br>
+      · <b>Ejercicios donde no llegaste al objetivo (paréntesis):</b> Mantén el peso, trabaja en técnica<br>
+      · <b>Cardio mes 2:</b> Sube a 20 min, o añade un 5° día de cardio solo (30-40 min caminata/bici)
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TRACKER ===================== -->
+<div class="week-panel" id="panel-5">
+  <div class="week-overview" style="grid-template-columns:1fr;">
+    <div>
+      <div class="week-title" style="color:var(--accent)">Registro de Pesos</div>
+      <div class="week-desc">Anota el peso real que usaste en cada sesión. Los datos se guardan en este dispositivo automáticamente.</div>
+    </div>
+  </div>
+
+  <!-- LOG FORM -->
+  <div class="tracker-form" id="trackerForm">
+    <div class="tf-row">
+      <div class="tf-group">
+        <label class="tf-label">Semana</label>
+        <select id="tf-week" class="tf-input">
+          <option value="1">Semana 1</option>
+          <option value="2">Semana 2</option>
+          <option value="3">Semana 3</option>
+          <option value="4">Semana 4</option>
+        </select>
+      </div>
+      <div class="tf-group">
+        <label class="tf-label">Sesión</label>
+        <select id="tf-session" class="tf-input">
+          <option value="Upper 1">Upper 1 (Lunes)</option>
+          <option value="Lower 1">Lower 1 (Martes)</option>
+          <option value="Upper 2">Upper 2 (Jueves)</option>
+          <option value="Lower 2">Lower 2 (Viernes)</option>
+        </select>
+      </div>
+      <div class="tf-group">
+        <label class="tf-label">Fecha</label>
+        <input type="date" id="tf-date" class="tf-input">
+      </div>
+    </div>
+
+    <div class="tf-row">
+      <div class="tf-group" style="flex:2">
+        <label class="tf-label">Ejercicio</label>
+        <select id="tf-exercise" class="tf-input">
+          <optgroup label="Upper 1">
+            <option>Peck Deck</option>
+            <option>Press Máq. Pecho</option>
+            <option>Jalón al pecho cerrado</option>
+            <option>Press Militar (máq.)</option>
+            <option>Elevación frontal polea baja</option>
+            <option>Predicador Máq.</option>
+            <option>Curl Z polea</option>
+            <option>Fondos Máq.</option>
+            <option>Encogimientos Manc.</option>
+          </optgroup>
+          <optgroup label="Lower 1">
+            <option>Curl acostado femoral</option>
+            <option>Curl sentado</option>
+            <option>Extensiones (quad)</option>
+            <option>Sentadilla Hack / Perfecta</option>
+            <option>Adductores máq.</option>
+            <option>Puente glúteo</option>
+            <option>Press pantorrilla</option>
+            <option>Costurera</option>
+          </optgroup>
+          <optgroup label="Upper 2">
+            <option>Dominadas (asistidas)</option>
+            <option>Remo máq. discos</option>
+            <option>Press pecho máq. (U2)</option>
+            <option>Elevación lateral máq.</option>
+            <option>Fondos máq. (U2)</option>
+            <option>Elevación frontal polea (U2)</option>
+            <option>Espalda baja en banco</option>
+            <option>Peck Deck Reverso</option>
+            <option>Predicador Inverso</option>
+            <option>Predicador Máq. (U2)</option>
+          </optgroup>
+          <optgroup label="Lower 2">
+            <option>Extensiones L2</option>
+            <option>Press Horizontal (femoral)</option>
+            <option>Curl acostado L2</option>
+            <option>Curl sentado L2</option>
+            <option>Puente glúteo L2</option>
+            <option>Press pantorrilla L2</option>
+            <option>Costurera L2</option>
+            <option>Abductores máq.</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="tf-group">
+        <label class="tf-label">Peso (kg)</label>
+        <input type="number" id="tf-weight" class="tf-input" placeholder="ej. 110" step="0.5">
+      </div>
+      <div class="tf-group">
+        <label class="tf-label">Reps logradas</label>
+        <input type="number" id="tf-reps" class="tf-input" placeholder="ej. 10">
+      </div>
+    </div>
+
+    <div class="tf-row">
+      <div class="tf-group" style="flex:1">
+        <label class="tf-label">Intensidad sentida</label>
+        <select id="tf-intensity" class="tf-input">
+          <option value="Fallo">Fallo — no pude más</option>
+          <option value="RIR 1">RIR 1 — quedé a 1 rep</option>
+          <option value="RIR 2" selected>RIR 2 — quedé a 2 reps</option>
+          <option value="RIR 3">RIR 3 — quedé a 3 reps</option>
+          <option value="RIR 4+">RIR 4+ — muy fácil</option>
+        </select>
+      </div>
+      <div class="tf-group" style="flex:2">
+        <label class="tf-label">Nota (opcional)</label>
+        <input type="text" id="tf-note" class="tf-input" placeholder="ej. codo molestó, técnica mejoró...">
+      </div>
+    </div>
+
+    <div class="tf-actions">
+      <button class="tf-btn tf-btn-primary" onclick="saveEntry()">＋ Guardar registro</button>
+      <span id="tf-feedback" class="tf-feedback"></span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="section-title" style="margin-top:28px">Historial</div>
+  <div class="filter-bar">
+    <select id="filter-week" class="tf-input tf-input-sm" onchange="renderLog()">
+      <option value="">Todas las semanas</option>
+      <option value="1">Sem 1</option>
+      <option value="2">Sem 2</option>
+      <option value="3">Sem 3</option>
+      <option value="4">Sem 4</option>
+    </select>
+    <select id="filter-session" class="tf-input tf-input-sm" onchange="renderLog()">
+      <option value="">Todas las sesiones</option>
+      <option value="Upper 1">Upper 1</option>
+      <option value="Lower 1">Lower 1</option>
+      <option value="Upper 2">Upper 2</option>
+      <option value="Lower 2">Lower 2</option>
+    </select>
+    <select id="filter-exercise" class="tf-input tf-input-sm" onchange="renderLog()">
+      <option value="">Todos los ejercicios</option>
+    </select>
+    <button class="tf-btn tf-btn-ghost" onclick="exportCSV()">↓ Exportar CSV</button>
+    <button class="tf-btn tf-btn-danger" onclick="clearAll()">🗑 Borrar todo</button>
+  </div>
+
+  <div id="log-container">
+    <div class="log-empty" id="log-empty">Aún no hay registros. Empieza anotando tu primera sesión arriba.</div>
+    <div class="log-table-wrap" id="log-table-wrap" style="display:none">
+      <table id="log-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Sem</th>
+            <th>Sesión</th>
+            <th>Ejercicio</th>
+            <th>Peso</th>
+            <th>Reps</th>
+            <th>Intensidad</th>
+            <th>Nota</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="log-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROGRESS SUMMARY -->
+  <div class="section-title" style="margin-top:28px">Progresión por ejercicio</div>
+  <div id="progress-summary">
+    <div class="log-empty">Los datos de progresión aparecerán aquí una vez tengas registros.</div>
+  </div>
+</div>
+
+</main>
+
+<style>
+  /* TRACKER STYLES */
+  .tracker-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .tf-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tf-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+  .tf-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tf-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    padding: 8px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .tf-input:focus { border-color: var(--accent); }
+  .tf-input-sm { padding: 6px 8px; font-size: 12px; }
+  select.tf-input option { background: var(--surface); }
+  .tf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .tf-btn {
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .tf-btn-primary { background: var(--accent); color: #0d0f14; }
+  .tf-btn-primary:hover { background: #d4ea2e; }
+  .tf-btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .tf-btn-ghost:hover { border-color: var(--accent3); color: var(--accent3); }
+  .tf-btn-danger { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
+  .tf-btn-danger:hover { background: rgba(255,71,87,0.2); }
+  .tf-feedback { font-size: 12px; color: var(--success); font-weight: 500; }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  .filter-bar .tf-input { max-width: 160px; flex: none; }
+
+  .log-empty {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 32px;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+  .log-table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
+  #log-table { min-width: 700px; }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: color 0.15s;
+  }
+  .delete-btn:hover { color: var(--danger); }
+
+  /* PROGRESS CARDS */
+  .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .progress-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .pc-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px; }
+  .pc-weeks { display:flex; flex-direction:column; gap:4px; }
+  .pc-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+  .pc-week-label { color:var(--muted); font-family:'Barlow Condensed',sans-serif; letter-spacing:0.5px; }
+  .pc-val { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; }
+  .pc-arrow { font-size:10px; color:var(--success); margin-left:4px; }
+  .pc-arrow.down { color:var(--w4); }
+</style>
+
+<script>
+  // ---- STORAGE KEY ----
+  const STORAGE_KEY = 'gym-log-v1';
+
+  // ---- LOAD / SAVE ----
+  function loadEntries() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch { return []; }
+  }
+  function saveEntries(arr) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch(e) { console.warn(e); }
+  }
+
+  // ---- INIT DATE ----
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('tf-date').value = new Date().toISOString().split('T')[0];
+    populateExerciseFilter();
+    renderLog();
+    renderProgress();
+  });
+
+  // ---- SAVE ENTRY ----
+  function saveEntry() {
+    const week     = document.getElementById('tf-week').value;
+    const session  = document.getElementById('tf-session').value;
+    const date     = document.getElementById('tf-date').value;
+    const exercise = document.getElementById('tf-exercise').value;
+    const weight   = document.getElementById('tf-weight').value;
+    const reps     = document.getElementById('tf-reps').value;
+    const intensity= document.getElementById('tf-intensity').value;
+    const note     = document.getElementById('tf-note').value.trim();
+
+    if (!weight || !reps) {
+      showFeedback('⚠ Ingresa peso y reps', 'var(--accent2)');
+      return;
+    }
+
+    const entry = {
+      id: Date.now(),
+      date, week, session, exercise,
+      weight: parseFloat(weight),
+      reps: parseInt(reps),
+      intensity, note
+    };
+
+    const entries = loadEntries();
+    entries.unshift(entry);
+    saveEntries(entries);
+
+    document.getElementById('tf-weight').value = '';
+    document.getElementById('tf-reps').value = '';
+    document.getElementById('tf-note').value = '';
+
+    showFeedback('✓ Guardado', 'var(--success)');
+    populateExerciseFilter();
+    renderLog();
+    renderProgress();
+  }
+
+  function showFeedback(msg, color) {
+    const el = document.getElementById('tf-feedback');
+    el.textContent = msg;
+    el.style.color = color;
+    setTimeout(() => el.textContent = '', 2000);
+  }
+
+  // ---- RENDER LOG ----
+  function renderLog() {
+    const entries = loadEntries();
+    const fw = document.getElementById('filter-week').value;
+    const fs = document.getElementById('filter-session').value;
+    const fe = document.getElementById('filter-exercise').value;
+
+    let filtered = entries.filter(e =>
+      (!fw || e.week == fw) &&
+      (!fs || e.session === fs) &&
+      (!fe || e.exercise === fe)
+    );
+
+    const tbody = document.getElementById('log-tbody');
+    const empty = document.getElementById('log-empty');
+    const wrap  = document.getElementById('log-table-wrap');
+
+    if (filtered.length === 0) {
+      empty.style.display = 'block';
+      wrap.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    wrap.style.display = 'block';
+
+    const wColors = { '1':'var(--w1)', '2':'var(--w2)', '3':'var(--w3)', '4':'var(--w4)' };
+    const iColors = { 'Fallo':'var(--danger)', 'RIR 1':'var(--accent2)', 'RIR 2':'#ffa726', 'RIR 3':'var(--muted)', 'RIR 4+':'var(--w4)' };
+
+    tbody.innerHTML = filtered.map(e => `
+      <tr>
+        <td>${e.date || '—'}</td>
+        <td><span style="font-family:'Barlow Condensed';font-weight:700;color:${wColors[e.week] || 'var(--text)'}">S${e.week}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${e.session}</td>
+        <td class="exercise-name">${e.exercise}</td>
+        <td class="weight-cell">${e.weight} kg</td>
+        <td>${e.reps} reps</td>
+        <td><span class="target-cell" style="background:${iColors[e.intensity]}22;color:${iColors[e.intensity]};padding:2px 7px;border-radius:3px;font-family:'Barlow Condensed';font-size:12px;font-weight:700">${e.intensity}</span></td>
+        <td class="note-cell">${e.note || ''}</td>
+        <td><button class="delete-btn" onclick="deleteEntry(${e.id})">✕</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // ---- DELETE ----
+  function deleteEntry(id) {
+    if (!confirm('¿Borrar este registro?')) return;
+    const entries = loadEntries().filter(e => e.id !== id);
+    saveEntries(entries);
+    renderLog();
+    renderProgress();
+  }
+
+  function clearAll() {
+    if (!confirm('¿Borrar TODOS los registros? Esta acción no se puede deshacer.')) return;
+    saveEntries([]);
+    renderLog();
+    renderProgress();
+  }
+
+  // ---- POPULATE EXERCISE FILTER ----
+  function populateExerciseFilter() {
+    const entries = loadEntries();
+    const exercises = [...new Set(entries.map(e => e.exercise))].sort();
+    const sel = document.getElementById('filter-exercise');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Todos los ejercicios</option>' +
+      exercises.map(ex => `<option value="${ex}" ${ex===cur?'selected':''}>${ex}</option>`).join('');
+  }
+
+  // ---- PROGRESS SUMMARY ----
+  function renderProgress() {
+    const entries = loadEntries();
+    const container = document.getElementById('progress-summary');
+    if (entries.length === 0) {
+      container.innerHTML = '<div class="log-empty">Los datos de progresión aparecerán aquí una vez tengas registros.</div>';
+      return;
+    }
+
+    // Group by exercise → by week → max weight
+    const map = {};
+    entries.forEach(e => {
+      if (!map[e.exercise]) map[e.exercise] = {};
+      const w = 'S' + e.week;
+      if (!map[e.exercise][w] || e.weight > map[e.exercise][w].weight) {
+        map[e.exercise][w] = { weight: e.weight, reps: e.reps };
+      }
+    });
+
+    const wOrder = ['S1','S2','S3','S4'];
+    const wColors = { 'S1':'var(--w1)', 'S2':'var(--w2)', 'S3':'var(--w3)', 'S4':'var(--w4)' };
+
+    const cards = Object.entries(map).map(([exercise, weeks]) => {
+      const rows = wOrder.filter(w => weeks[w]).map((w, i, arr) => {
+        const prev = i > 0 ? weeks[arr[i-1]]?.weight : null;
+        const cur  = weeks[w].weight;
+        let arrow = '';
+        if (prev !== null) {
+          arrow = cur > prev
+            ? `<span class="pc-arrow">▲ +${(cur-prev).toFixed(1)}</span>`
+            : cur < prev
+              ? `<span class="pc-arrow down">▼ ${(cur-prev).toFixed(1)}</span>`
+              : '';
+        }
+        return `<div class="pc-row">
+          <span class="pc-week-label" style="color:${wColors[w]}">${w}</span>
+          <span class="pc-val">${cur} kg × ${weeks[w].reps} reps ${arrow}</span>
+        </div>`;
+      }).join('');
+
+      return `<div class="progress-card">
+        <div class="pc-name">${exercise}</div>
+        <div class="pc-weeks">${rows}</div>
+      </div>`;
+    }).join('');
+
+    container.innerHTML = `<div class="progress-grid">${cards}</div>`;
+  }
+
+  // ---- EXPORT CSV ----
+  function exportCSV() {
+    const entries = loadEntries();
+    if (entries.length === 0) { alert('No hay registros para exportar.'); return; }
+    const header = 'Fecha,Semana,Sesion,Ejercicio,Peso (kg),Reps,Intensidad,Nota';
+    const rows = entries.map(e =>
+      [e.date, e.week, e.session, `"${e.exercise}"`, e.weight, e.reps, e.intensity, `"${e.note||''}"`].join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'registro_gym.csv';
+    a.click();
+  }
+
+  // ---- NAV ----
+  function showWeek(n) {
+    document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + n).classList.add('active');
+    const tabIndex = n === 0 ? 4 : n === 5 ? 5 : n - 1;
+    document.querySelectorAll('.week-tab')[tabIndex].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (n === 5) { populateExerciseFilter(); renderLog(); renderProgress(); }
+  }
+
+  function toggleBlock(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+</script>
+</body>
+</html>
