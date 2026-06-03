@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plan Mensual — Regreso al Gym</title>
+<title>Plan Mensual — Gym</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -210,7 +210,6 @@
   }
   .type-upper { background: rgba(71,200,255,0.15); color: var(--accent3); }
   .type-lower { background: rgba(255,107,53,0.15); color: var(--accent2); }
-  .type-cardio { background: rgba(46,213,115,0.15); color: var(--success); }
   .type-rest { background: rgba(107,114,128,0.1); color: var(--muted); }
   .day-body { padding: 10px 14px; }
   .day-workout { font-size: 13px; color: var(--text); }
@@ -422,6 +421,106 @@
     .week-overview { grid-template-columns: 1fr; }
     .schedule-grid { grid-template-columns: 1fr 1fr; }
   }
+
+  /* TRACKER STYLES */
+  .tracker-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .tf-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .tf-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+  .tf-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tf-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    padding: 8px 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .tf-input:focus { border-color: var(--accent); }
+  .tf-input-sm { padding: 6px 8px; font-size: 12px; }
+  select.tf-input option { background: var(--surface); }
+  .tf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .tf-btn {
+    padding: 9px 18px;
+    border-radius: 5px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .tf-btn-primary { background: var(--accent); color: #0d0f14; }
+  .tf-btn-primary:hover { background: #d4ea2e; }
+  .tf-btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .tf-btn-ghost:hover { border-color: var(--accent3); color: var(--accent3); }
+  .tf-btn-danger { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
+  .tf-btn-danger:hover { background: rgba(255,71,87,0.2); }
+  .tf-feedback { font-size: 12px; color: var(--success); font-weight: 500; }
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+  .filter-bar .tf-input { max-width: 160px; flex: none; }
+  .log-empty {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 32px;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+  .log-table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
+  #log-table { min-width: 700px; }
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: color 0.15s;
+  }
+  .delete-btn:hover { color: var(--danger); }
+  .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .progress-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .pc-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px; }
+  .pc-weeks { display:flex; flex-direction:column; gap:4px; }
+  .pc-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; }
+  .pc-week-label { color:var(--muted); font-family:'Barlow Condensed',sans-serif; letter-spacing:0.5px; }
+  .pc-val { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; }
+  .pc-arrow { font-size:10px; color:var(--success); margin-left:4px; }
+  .pc-arrow.down { color:var(--w4); }
 </style>
 </head>
 <body>
@@ -460,10 +559,8 @@
 </div>
 
 <script>
-  // Cambia 'mipass123' por la contraseña que quieras
   const PASS = 'mipass123';
   const SESSION_KEY = 'gym-auth';
-
   function checkPass() {
     const val = document.getElementById('gate-input').value;
     if (val === PASS) {
@@ -476,22 +573,20 @@
       setTimeout(() => err.textContent = '', 2000);
     }
   }
-
-  // Si ya autenticó en esta sesión, ocultar gate directo
   if (sessionStorage.getItem(SESSION_KEY) === '1') {
     document.getElementById('gate').style.display = 'none';
   }
 </script>
 
 <header>
-  <div class="header-tag">Programa de reactivación</div>
-  <h1>Plan <span>Mensual</span><br>Regreso al Gym</h1>
+  <div class="header-tag">Programa mensual</div>
+  <h1>Plan <span>Mensual</span><br>Tren Sup / Inf</h1>
   <div class="header-sub">Upper/Lower · 4 días/semana · ~1 hora por sesión · 15 min cardio incluido</div>
   <div class="badges">
     <span class="badge accent">Upper/Lower Split</span>
     <span class="badge orange">Progresión al Fallo</span>
     <span class="badge blue">Cardio integrado</span>
-    <span class="badge">6 meses pausa</span>
+    <span class="badge">4 sesiones / semana</span>
   </div>
 </header>
 
@@ -560,11 +655,11 @@
 
   <div class="section-title">Estructura semanal tipo</div>
   <div class="schedule-grid">
-    <div class="day-card"><div class="day-header"><span class="day-name">Lunes</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Upper 1</div><div class="day-note">Pecho / Espalda / Hombros / Brazos</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
-    <div class="day-card"><div class="day-header"><span class="day-name">Martes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Lower 1</div><div class="day-note">Femoral / Quad / Glúteo / Pantorrilla</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Lunes</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Tren Sup. Día 1</div><div class="day-note">Press Pec / Remo / Peck Deck / Jalón / Hombro / Bíceps</div><div class="time-chips"><span class="time-chip">~45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Martes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Tren Inf. Día 1</div><div class="day-note">Extensiones / Hip Thrust / Press Piernas / Curl Sent. / Pantorrilla</div><div class="time-chips"><span class="time-chip">~45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
     <div class="day-card rest"><div class="day-header"><span class="day-name">Miércoles</span><span class="day-type type-rest">Descanso</span></div><div class="day-body"><div class="day-workout">Recuperación</div><div class="day-note">Caminar opcional 20-30 min</div></div></div>
-    <div class="day-card"><div class="day-header"><span class="day-name">Jueves</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Upper 2</div><div class="day-note">Espalda / Pecho máq. / Tríceps / Bíceps</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
-    <div class="day-card"><div class="day-header"><span class="day-name">Viernes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Lower 2</div><div class="day-note">Quad / Femoral / Glúteo / Costurera</div><div class="time-chips"><span class="time-chip">45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Jueves</span><span class="day-type type-upper">Upper</span></div><div class="day-body"><div class="day-workout">Tren Sup. Día 2</div><div class="day-note">Peck Deck / Remo / Shoulder Press / Fondos / Bíceps / Peck Rev.</div><div class="time-chips"><span class="time-chip">~45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
+    <div class="day-card"><div class="day-header"><span class="day-name">Viernes</span><span class="day-type type-lower">Lower</span></div><div class="day-body"><div class="day-workout">Tren Inf. Día 2</div><div class="day-note">Extensiones / Curl Sent. / Patada Glúteo / Press Piernas / Abductores</div><div class="time-chips"><span class="time-chip">~45 min</span><span class="time-chip">+15 cardio</span></div></div></div>
     <div class="day-card rest"><div class="day-header"><span class="day-name">Sáb / Dom</span><span class="day-type type-rest">Descanso</span></div><div class="day-body"><div class="day-workout">Recuperación</div><div class="day-note">Paseos, movilidad o nada</div></div></div>
   </div>
 
@@ -573,19 +668,19 @@
     <div class="cardio-title">🏃 15 minutos al final de cada sesión</div>
     <div class="cardio-rows">
       <div class="cardio-item"><strong>Sem 1-2</strong>Caminata inclinada 6-8% · ritmo moderado · FC ~120-130</div>
-      <div class="cardio-item"><strong>Sem 3</strong>Intervalos ligeros · 1 min trotar / 1 min caminar · x7</div>
+      <div class="cardio-item"><strong>Sem 3</strong>Intervalos ligeros · 1 min trotar / 1 min caminar · ×7</div>
       <div class="cardio-item"><strong>Sem 4 (descarga)</strong>Caminata suave 10 min · FC ~100-110 · recuperación activa</div>
     </div>
   </div>
 
-  <div class="section-title">Tips clave para el regreso</div>
+  <div class="section-title">Tips clave</div>
   <div class="tips-grid">
-    <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-title">Semana 1: sin ego</div><div class="tip-text">Aunque la calistenia mantuvo tu base, las cargas libres y máquinas se sienten diferentes. Usa los pesos sugeridos como punto de partida conservador.</div></div>
-    <div class="tip-card"><div class="tip-icon">🎯</div><div class="tip-title">RIR real</div><div class="tip-text">RIR = Reps In Reserve. RIR 2 significa que podrías hacer 2 reps más pero paras. Sem 1 sobra margen, Sem 3 llegas al fallo o casi.</div></div>
-    <div class="tip-card"><div class="tip-icon">🕐</div><div class="tip-title">Tiempo en el gym</div><div class="tip-text">Descansa 90-120 seg entre series en pesos compuestos, 60-75 seg en aislamiento. Con eso cabes en 45 min de pesas + 15 min cardio.</div></div>
-    <div class="tip-card"><div class="tip-icon">🍽️</div><div class="tip-title">Déficit calórico</div><div class="tip-text">El cardio ayuda, pero la pérdida de peso ocurre en la cocina. Mantén el plan de equivalentes de tu nutrióloga durante todo el mesociclo.</div></div>
-    <div class="tip-card"><div class="tip-icon">😴</div><div class="tip-title">DOMS sem 1-2</div><div class="tip-text">Espera agujetas fuertes los primeros días. Son normales por el retorno. El calor, estirar y proteína adecuada ayudan a recuperarse.</div></div>
-    <div class="tip-card"><div class="tip-icon">🔄</div><div class="tip-title">Progresión siguiente mes</div><div class="tip-text">Al terminar la descarga, el mes 2 repite la estructura subiendo cargas ~5-10% en ejercicios donde llegaste cómodo al fallo.</div></div>
+    <div class="tip-card"><div class="tip-icon">⚡</div><div class="tip-title">Sem 1: sin ego</div><div class="tip-text">Reduce los pesos de referencia un 20-25% la primera semana. El objetivo es reaprender los patrones, no llegar al fallo.</div></div>
+    <div class="tip-card"><div class="tip-icon">🎯</div><div class="tip-title">RIR real</div><div class="tip-text">RIR = Reps In Reserve. RIR 2 = podrías hacer 2 reps más pero paras. Sem 1 mucho margen, sem 3 llegas al fallo.</div></div>
+    <div class="tip-card"><div class="tip-icon">🕐</div><div class="tip-title">Descansos</div><div class="tip-text">90-120 seg entre series en compuestos, 60-75 seg en aislamiento. Así cabes en 45 min de pesas + 15 min cardio.</div></div>
+    <div class="tip-card"><div class="tip-icon">❓</div><div class="tip-title">Pesos por determinar</div><div class="tip-text">Los ejercicios marcados con "?" son los que debes calibrar en sem 1. Anótalos para referencia de las semanas siguientes.</div></div>
+    <div class="tip-card"><div class="tip-icon">😴</div><div class="tip-title">DOMS sem 1-2</div><div class="tip-text">Espera agujetas fuertes los primeros días. Son normales. El calor, estiramiento y proteína adecuada aceleran la recuperación.</div></div>
+    <div class="tip-card"><div class="tip-icon">🔄</div><div class="tip-title">Progresión mes 2</div><div class="tip-text">Al terminar la descarga, repite la estructura subiendo cargas ~5 kg en máquinas y 2.5 kg en ejercicios donde llegaste bien al fallo.</div></div>
   </div>
 </div>
 
@@ -594,7 +689,7 @@
   <div class="week-overview">
     <div>
       <div class="week-title" style="color:var(--w1)">Semana 1 — Activación</div>
-      <div class="week-desc">Readaptación neuromuscular · Aprender las cargas · Sin llevar al fallo · El objetivo es que el músculo recuerde los patrones de movimiento</div>
+      <div class="week-desc">Readaptación neuromuscular · Cargas al 70-75% del objetivo · Sin fallo · Calibrar los ejercicios con "?" · Reaprender patrones de movimiento</div>
     </div>
     <span class="intensity-pill" style="background:rgba(255,107,53,0.15); color:var(--w1)">RIR 2-3</span>
   </div>
@@ -602,32 +697,31 @@
   <div class="progression-box orange">
     <div class="pb-title">🎯 Estrategia semana 1</div>
     <div class="pb-items">
-      <b>Cargas:</b> Usa los pesos sugeridos pero baja un 20-25% (ej. si dice 150kg, empieza en 115-120kg)<br>
-      <b>Objetivo:</b> Completar todas las series sin fallo, sentir el músculo trabajar<br>
-      <b>Cardio:</b> Caminata inclinada 15 min al finalizar (6% inclinación, ritmo conversacional)<br>
-      <b>Aviso:</b> Habrá agujetas fuertes del día 2-3 en adelante — es completamente normal
+      <b>Cargas:</b> Baja un 20-25% los pesos de referencia. Ej: si el objetivo es 115 kg, empieza en 85-90 kg.<br>
+      <b>Ejercicios con "?":</b> Prueba varios pesos hasta encontrar uno que permita la técnica perfecta con margen. Anota el resultado.<br>
+      <b>Objetivo:</b> Completar todas las series sintiendo el músculo trabajar, sin fallo, sin dolor articular.<br>
+      <b>Cardio:</b> Caminata inclinada 15 min al finalizar (6% inclinación, ritmo conversacional).
     </div>
   </div>
 
-  <div class="section-title">Lunes — Upper 1</div>
-  <div class="workout-block" id="u1w1">
-    <div class="workout-block-header" onclick="toggleBlock('u1w1')">
-      <span class="wb-title">Upper 1 · Pecho / Espalda / Hombros / Brazos</span>
+  <!-- LUNES: TREN SUP DÍA 1 -->
+  <div class="section-title">Lunes — Tren Sup. Día 1</div>
+  <div class="workout-block" id="sup1w1">
+    <div class="workout-block-header" onclick="toggleBlock('sup1w1')">
+      <span class="wb-title">Tren Superior Día 1 · Pecho / Espalda / Hombro / Bíceps</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x15, 100x12</td><td class="sets-cell">150x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Paras con 3 reps en el tanque</td></tr>
-          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12</td><td class="sets-cell">115x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Controla la bajada 2 seg</td></tr>
-          <tr><td>3</td><td class="exercise-name">Jalón al pecho cerrado</td><td class="weight-cell">75x10, 90x10</td><td class="sets-cell">100x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Retracción escapular completa</td></tr>
-          <tr><td>4</td><td class="exercise-name">Press Militar (máq.)</td><td class="weight-cell">D45x12</td><td class="sets-cell">55x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Rango completo sin arquear</td></tr>
-          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">20x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Ligero, sentir el deltoide</td></tr>
-          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">80x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Bíceps en estiramiento completo</td></tr>
-          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">20x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Sentir el pico del bíceps</td></tr>
-          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">120x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Trícep largo, codos atrás</td></tr>
-          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Checar · 2x10</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Trapecio, peso muy ligero</td></tr>
+          <tr><td>1</td><td class="exercise-name">Press Pec. Máq.</td><td class="weight-cell">75x12</td><td class="sets-cell">90x10 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo referencia: 115x10. Controla la bajada 2 seg</td></tr>
+          <tr><td>2</td><td class="exercise-name">Remo Máq. Discos (1 mano)</td><td class="weight-cell">80x10</td><td class="sets-cell">80x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 115. Codo pegado al cuerpo, retracción escapular</td></tr>
+          <tr><td>3</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12</td><td class="sets-cell">120x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 150. Pausa 1 seg en cierre</td></tr>
+          <tr><td>4</td><td class="exercise-name">Jalón agarre cerrado</td><td class="weight-cell">75x10, 90x10</td><td class="sets-cell">90x10 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 110x9. Retracción escapular completa</td></tr>
+          <tr><td>5</td><td class="exercise-name">Shoulder Lat Rise (elev. lateral)</td><td class="weight-cell">40x10</td><td class="sets-cell">50x10 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 65. Sin subir el trapecio, solo deltoides</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Inverso</td><td class="weight-cell">55x10</td><td class="sets-cell">70x9 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 95x9. Cabeza corta del bíceps</td></tr>
+          <tr><td>7</td><td class="exercise-name">Predicador Máquina</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">70x10 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 90x10. Estiramiento completo del bíceps</td></tr>
         </tbody>
       </table>
     </div>
@@ -643,24 +737,24 @@
     </div>
   </div>
 
-  <div class="section-title">Martes — Lower 1</div>
-  <div class="workout-block" id="l1w1">
-    <div class="workout-block-header" onclick="toggleBlock('l1w1')">
-      <span class="wb-title">Lower 1 · Femoral / Quad / Glúteo / Pantorrilla</span>
+  <!-- MARTES: TREN INF DÍA 1 -->
+  <div class="section-title">Martes — Tren Inf. Día 1</div>
+  <div class="workout-block" id="inf1w1">
+    <div class="workout-block-header" onclick="toggleBlock('inf1w1')">
+      <span class="wb-title">Tren Inferior Día 1 · Quad / Femoral / Glúteo / Pantorrilla</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Siente el femoral en la bajada</td></tr>
-          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Rango completo, sin rebote</td></tr>
-          <tr><td>3</td><td class="exercise-name">Extensiones (quad)</td><td class="weight-cell">85x15, 100x12</td><td class="sets-cell">130x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pico de contracción 1 seg arriba</td></tr>
-          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Determinar ligero</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Técnica > peso en sem 1</td></tr>
-          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pausa en cierre 1 seg</td></tr>
-          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Contracción máxima arriba</td></tr>
-          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">240x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Rango completo, talón abajo</td></tr>
-          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Siente la tensión en toda la pierna</td></tr>
+          <tr><td>1</td><td class="exercise-name">Extensiones (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Pico de contracción 1 seg arriba</td></tr>
+          <tr><td>2</td><td class="exercise-name">Hip Thrust</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 4 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Calibrar sem 1. Aprieta glúteo en la parte alta</td></tr>
+          <tr><td>3</td><td class="exercise-name">Press Piernas Máq.</td><td class="weight-cell">145x15, 175x12</td><td class="sets-cell">175x12 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 225x12. Rodillas sin bloquear arriba</td></tr>
+          <tr><td>4</td><td class="exercise-name">Curl Sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">80x9 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 100x9. Rango completo, sin rebote</td></tr>
+          <tr><td>5</td><td class="exercise-name">Pantorrilla en Press (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Rango completo, talón abajo</td></tr>
+          <tr><td>6</td><td class="exercise-name">Curl Acostado</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 110x9. Femoral en el estiramiento</td></tr>
+          <tr><td>7</td><td class="exercise-name">Adductores Máq.</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Pausa 1 seg en cierre</td></tr>
         </tbody>
       </table>
     </div>
@@ -676,49 +770,48 @@
     </div>
   </div>
 
-  <div class="section-title">Jueves — Upper 2</div>
-  <div class="workout-block" id="u2w1">
-    <div class="workout-block-header" onclick="toggleBlock('u2w1')">
-      <span class="wb-title">Upper 2 · Espalda / Pecho / Hombros / Tríceps / Bíceps</span>
+  <!-- JUEVES: TREN SUP DÍA 2 -->
+  <div class="section-title">Jueves — Tren Sup. Día 2</div>
+  <div class="workout-block" id="sup2w1">
+    <div class="workout-block-header" onclick="toggleBlock('sup2w1')">
+      <span class="wb-title">Tren Superior Día 2 · Pecho / Espalda / Hombro / Tríceps / Bíceps</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Dominadas (asistidas)</td><td class="weight-cell">-70x8</td><td class="sets-cell">-55x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">La calistenia ayuda aquí</td></tr>
-          <tr><td>2</td><td class="exercise-name">Remo máq. discos</td><td class="weight-cell">80x10</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Codos pegados al cuerpo</td></tr>
-          <tr><td>3</td><td class="exercise-name">Press pecho máq.</td><td class="weight-cell">75x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo pecho de la semana, bajar %</td></tr>
-          <tr><td>4</td><td class="exercise-name">Elevación lateral máq.</td><td class="weight-cell">40x10, 55x10</td><td class="sets-cell">55x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Sin trampa, no subas el hombro</td></tr>
-          <tr><td>5</td><td class="exercise-name">Fondos máq.</td><td class="weight-cell">—</td><td class="sets-cell">120x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo tríceps, cuidado el codo</td></tr>
-          <tr><td>6</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">20x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Ligero, a lo largo de la semana</td></tr>
-          <tr><td>7</td><td class="exercise-name">Espalda baja en banco</td><td class="weight-cell">—</td><td class="sets-cell">2x10</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Hiperextensión, peso corporal</td></tr>
-          <tr><td>8</td><td class="exercise-name">Peck Deck Reverso</td><td class="weight-cell">55x10, 90x10</td><td class="sets-cell">90x9 · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Deltoides posterior, crucial</td></tr>
-          <tr><td>9</td><td class="exercise-name">Predicador Inverso</td><td class="weight-cell">55x10</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Bíceps, cabeza corta</td></tr>
-          <tr><td>10</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">80x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Tercer bíceps, bajar peso</td></tr>
+          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12</td><td class="sets-cell">120x10 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo pecho sem. Bajar % vs Día 1</td></tr>
+          <tr><td>2</td><td class="exercise-name">Remo Máq./Polea (codo pegado)</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Jalón unilateral con codo pegado</td></tr>
+          <tr><td>3</td><td class="exercise-name">Shoulder Press</td><td class="weight-cell">D45x12</td><td class="sets-cell">45x12 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Objetivo: 55x12. Rango completo sin arquear</td></tr>
+          <tr><td>4</td><td class="exercise-name">Remo Abierto</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Espalda media, codos abiertos</td></tr>
+          <tr><td>5</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Tríceps, codos atrás</td></tr>
+          <tr><td>6</td><td class="exercise-name">Bíceps Curl Máq. / Curl Polea Z</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Pico de contracción arriba</td></tr>
+          <tr><td>7</td><td class="exercise-name">Press Pecho Alto</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Pecho superior, inclinado</td></tr>
+          <tr><td>8</td><td class="exercise-name">Peck Deck Reverso</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 2-3</span></td><td class="note-cell">Calibrar sem 1. Deltoides posterior, crucial</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="section-title">Viernes — Lower 2</div>
-  <div class="workout-block" id="l2w1">
-    <div class="workout-block-header" onclick="toggleBlock('l2w1')">
-      <span class="wb-title">Lower 2 · Quad / Femoral / Glúteo / Costurera</span>
+  <!-- VIERNES: TREN INF DÍA 2 -->
+  <div class="section-title">Viernes — Tren Inf. Día 2</div>
+  <div class="workout-block" id="inf2w1">
+    <div class="workout-block-header" onclick="toggleBlock('inf2w1')">
+      <span class="wb-title">Tren Inferior Día 2 · Quad / Femoral / Glúteo / Abductores</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Series calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Extensiones (quad)</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">140x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo quad, igual cuidado</td></tr>
-          <tr><td>2</td><td class="exercise-name">Press Horizontal (femoral)</td><td class="weight-cell">145x15, 175x12</td><td class="sets-cell">200x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Prensa inclinada orientada al femoral</td></tr>
-          <tr><td>3</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">100x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo curl acostado</td></tr>
-          <tr><td>4</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">90x9 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Femoral en estiramiento máximo</td></tr>
-          <tr><td>5</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Glúteo, empuje desde el talón</td></tr>
-          <tr><td>6</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">240x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo pantorrilla sem</td></tr>
-          <tr><td>7</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Músculo raro, fluye con él</td></tr>
-          <tr><td>8</td><td class="exercise-name">Abductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">Determinar · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Pausa al abrir</td></tr>
+          <tr><td>1</td><td class="exercise-name">Extensiones (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Más sets que Inf 1. Calibrar con mismo peso</td></tr>
+          <tr><td>2</td><td class="exercise-name">Curl Sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">80x9 · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo curl sentado sem. Mismo peso que Inf 1</td></tr>
+          <tr><td>3</td><td class="exercise-name">Patada Glúteo</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 2 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Contracción máxima arriba</td></tr>
+          <tr><td>4</td><td class="exercise-name">Press Piernas Máq.</td><td class="weight-cell">145x15, 175x12</td><td class="sets-cell">175x12 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Solo 1 efectiva en Inf 2 (vs 3 en Inf 1)</td></tr>
+          <tr><td>5</td><td class="exercise-name">Pantorrilla en Press (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Mismo peso que Inf 1. Segundo de la semana</td></tr>
+          <tr><td>6</td><td class="exercise-name">Curl Acostado</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">90x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Segundo curl acostado sem. Siente el femoral</td></tr>
+          <tr><td>7</td><td class="exercise-name">Abductores Máq.</td><td class="weight-cell">—</td><td class="sets-cell">Por det. · 3 series</td><td><span class="target-cell target-rir2">RIR 3</span></td><td class="note-cell">Calibrar sem 1. Pausa al abrir</td></tr>
         </tbody>
       </table>
     </div>
@@ -730,7 +823,7 @@
   <div class="week-overview">
     <div>
       <div class="week-title" style="color:var(--w2)">Semana 2 — Acumulación</div>
-      <div class="week-desc">Cargas del plan original · Series al RIR 1-2 · Volumen completo · Ya deberías saber qué peso usar en cada ejercicio</div>
+      <div class="week-desc">Cargas del plan original · Series al RIR 1-2 · Volumen completo · Ya tienes referencia de todos los ejercicios incluyendo los "?"</div>
     </div>
     <span class="intensity-pill" style="background:rgba(255,167,38,0.15); color:var(--w2)">RIR 1-2</span>
   </div>
@@ -738,67 +831,64 @@
   <div class="progression-box" style="border-left-color:var(--w2)">
     <div class="pb-title">🎯 Estrategia semana 2</div>
     <div class="pb-items">
-      <b>Cargas:</b> Usa exactamente los pesos sugeridos en el plan (los que aparecen entre paréntesis son el objetivo, usa los anteriores)<br>
-      <b>Objetivo:</b> Series efectivas al RIR 1-2 — una rep más y podrías fallar, pero no fallas<br>
-      <b>Ajuste:</b> Si sem 1 fue muy fácil, sube 5-10% en algunos ejercicios<br>
-      <b>Cardio:</b> Mantén caminata inclinada, sube a 8% o añade ligera velocidad
+      <b>Cargas:</b> Usa exactamente los pesos de referencia del plan. Para los "?", usa el peso que calibraste en sem 1.<br>
+      <b>Objetivo:</b> RIR 1-2 en todas las series — sientes que podrías hacer 1-2 reps más, pero paras.<br>
+      <b>Ajuste:</b> Si sem 1 fue muy fácil, sube 5-10% en algunos ejercicios.<br>
+      <b>Cardio:</b> Mantén caminata inclinada, sube a 8% o añade ligera velocidad.
     </div>
   </div>
 
-  <div class="section-title">Lunes — Upper 1</div>
-  <div class="workout-block" id="u1w2">
-    <div class="workout-block-header" onclick="toggleBlock('u1w2')">
-      <span class="wb-title">Upper 1 · Pecho / Espalda / Hombros / Brazos</span>
+  <div class="section-title">Lunes — Tren Sup. Día 1</div>
+  <div class="workout-block" id="sup1w2">
+    <div class="workout-block-header" onclick="toggleBlock('sup1w2')">
+      <span class="wb-title">Tren Superior Día 1 · Cargas de referencia</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12</td><td class="sets-cell">150x10x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 180 a futuro</td></tr>
-          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 145 a futuro</td></tr>
-          <tr><td>3</td><td class="exercise-name">Jalón al pecho cerrado</td><td class="weight-cell">75x10, 90x10</td><td class="sets-cell">110x10x8 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 120</td></tr>
-          <tr><td>4</td><td class="exercise-name">Press Militar (máq.)</td><td class="weight-cell">D45x12</td><td class="sets-cell">55x12x9 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 70</td></tr>
-          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">25x10x10x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 35</td></tr>
-          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10</td><td class="sets-cell">85x10, 90x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 105</td></tr>
-          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">25x12 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 40</td></tr>
-          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">140x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 160</td></tr>
-          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Checar · 2x10</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Ya sabes el peso de sem 1</td></tr>
+          <tr><td>1</td><td class="exercise-name">Press Pec. Máq.</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115x10 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan. Controla la bajada</td></tr>
+          <tr><td>2</td><td class="exercise-name">Remo Máq. Discos (1 mano)</td><td class="weight-cell">80x10</td><td class="sets-cell">115x10 · 1 serie</td><td><span class="target-cell target-rir2">RIR 2</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>3</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12</td><td class="sets-cell">150x10 · 2 series</td><td><span class="target-cell target-rir2">RIR 2</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>4</td><td class="exercise-name">Jalón agarre cerrado</td><td class="weight-cell">75x10, 90x10, 110x9</td><td class="sets-cell">110x9 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>5</td><td class="exercise-name">Shoulder Lat Rise</td><td class="weight-cell">40x10, 55x10</td><td class="sets-cell">65x10 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Inverso</td><td class="weight-cell">55x10, 90x10</td><td class="sets-cell">95x9 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>7</td><td class="exercise-name">Predicador Máquina</td><td class="weight-cell">50x12, 65x10, 85x10</td><td class="sets-cell">90x10 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="section-title">Martes — Lower 1</div>
-  <div class="workout-block" id="l1w2">
-    <div class="workout-block-header" onclick="toggleBlock('l1w2')">
-      <span class="wb-title">Lower 1 · Femoral / Quad / Glúteo / Pantorrilla</span>
+  <div class="section-title">Martes — Tren Inf. Día 1</div>
+  <div class="workout-block" id="inf1w2">
+    <div class="workout-block-header" onclick="toggleBlock('inf1w2')">
+      <span class="wb-title">Tren Inferior Día 1 · Cargas de referencia</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12</td><td class="sets-cell">110x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 120-125</td></tr>
-          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10</td><td class="sets-cell">100x9 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 110-115</td></tr>
-          <tr><td>3</td><td class="exercise-name">Extensiones</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">145x12 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 160</td></tr>
-          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Peso sem 1</td><td class="sets-cell">+5-10% sem 1 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Ya tienes referencia</td></tr>
-          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 2 series</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Pausa en cierre</td></tr>
-          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Contraer glúteo al máximo</td></tr>
-          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10</td><td class="sets-cell">250x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 265-270</td></tr>
-          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">150x10 · 1 serie</td><td><span class="target-cell target-rir1">RIR 2</span></td><td class="note-cell">Objetivo: 165-175</td></tr>
+          <tr><td>1</td><td class="exercise-name">Extensiones (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 1 · 1 serie</td><td><span class="target-cell target-rir2">RIR 2</span></td><td class="note-cell">Sube si sem 1 fue muy fácil</td></tr>
+          <tr><td>2</td><td class="exercise-name">Hip Thrust</td><td class="weight-cell">—</td><td class="sets-cell">+5-10% sem 1 · 4 series</td><td><span class="target-cell target-rir2">RIR 2-1</span></td><td class="note-cell">Ya tienes referencia de sem 1</td></tr>
+          <tr><td>3</td><td class="exercise-name">Press Piernas Máq.</td><td class="weight-cell">145x15, 175x12, 220x12</td><td class="sets-cell">225x12 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>4</td><td class="exercise-name">Curl Sentado</td><td class="weight-cell">70x10, 100x9</td><td class="sets-cell">100x9 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>5</td><td class="exercise-name">Pantorrilla en Press (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Ya tienes referencia</td></tr>
+          <tr><td>6</td><td class="exercise-name">Curl Acostado</td><td class="weight-cell">70x12, 90x12, 110x10</td><td class="sets-cell">110x9 · 1 serie</td><td><span class="target-cell target-rir2">RIR 2</span></td><td class="note-cell">Carga objetivo del plan</td></tr>
+          <tr><td>7</td><td class="exercise-name">Adductores Máq.</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 1 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Ya tienes referencia</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="section-title">Jueves — Upper 2 &nbsp; / &nbsp; Viernes — Lower 2</div>
+  <div class="section-title">Jueves — Sup 2 &nbsp;/&nbsp; Viernes — Inf 2</div>
   <div class="progression-box" style="border-left-color:var(--w2)">
-    <div class="pb-title">Upper 2 y Lower 2 — Sem 2</div>
+    <div class="pb-title">Tren Sup 2 y Tren Inf 2 — Sem 2</div>
     <div class="pb-items">
-      Misma estructura que la semana 1 para Upper 2 y Lower 2, pero <b>subiendo los pesos un 5-10%</b> respecto a lo que usaste sem 1.<br>
-      Aplica <b>RIR 1-2</b> en todas las series efectivas. Sientes que podrías hacer 1-2 reps más, pero paras ahí.<br>
-      El cardio post-entreno se mantiene: <b>15 min de caminata inclinada a 8%</b> o bici nivel moderado para Lower.
+      Misma estructura que sem 1 para Sup 2 e Inf 2, pero <b>subiendo los pesos un 5-10%</b> respecto a lo que usaste la semana anterior.<br>
+      Aplica <b>RIR 1-2</b> en todas las series efectivas. Para los ejercicios con "?", usa el peso de sem 1 y ajusta según sensación.<br>
+      El cardio se mantiene: <b>15 min de caminata inclinada a 8%</b> para Upper, y bici/elíptica nivel moderado para Lower.
     </div>
   </div>
 </div>
@@ -808,7 +898,7 @@
   <div class="week-overview">
     <div>
       <div class="week-title" style="color:var(--w3)">Semana 3 — Alta Intensidad</div>
-      <div class="week-desc">Fallo muscular en ejercicios de aislamiento · RIR 1 en compuestos · Pesos sugeridos del plan o más · Máxima estimulación</div>
+      <div class="week-desc">Fallo muscular en aislamientos · RIR 1 en compuestos · Pesos del plan o más · Máxima estimulación</div>
     </div>
     <span class="intensity-pill" style="background:rgba(71,200,255,0.15); color:var(--w3)">FALLO / RIR 1</span>
   </div>
@@ -816,68 +906,65 @@
   <div class="progression-box blue">
     <div class="pb-title">🎯 Estrategia semana 3</div>
     <div class="pb-items">
-      <b>Aislamientos (curl, extensiones, elevaciones, costurera, abductores, etc.):</b> Llegar al fallo completo. No hay rep más.<br>
-      <b>Compuestos (jalón, press, sentadilla, dominadas, remo):</b> RIR 1 — una rep antes del fallo.<br>
-      <b>Pesos:</b> Usa los valores objetivo (en paréntesis) si los alcanzaste, o el peso de sem 2 si no.<br>
-      <b>Cardio:</b> Intervalos ligeros 15 min (1 min trotar / 1 min caminar x7) — quema más calorías post-fatigado.<br>
-      <b>Advertencia:</b> Las agujetas de esta semana serán las peores. Duerme bien, proteína alta.
+      <b>Aislamientos (peck deck, curl, extensiones, predicadores, elevaciones, hip thrust, patada glúteo, abductores, adductores, pantorrilla):</b> Fallo completo. Sin rep más.<br>
+      <b>Compuestos (press pec, jalón, remo, press piernas, shoulder press, fondos):</b> RIR 1 — una rep antes del fallo.<br>
+      <b>Pesos:</b> Usa los valores de sem 2. Si llegaste cómodo, sube 5% más.<br>
+      <b>Cardio:</b> Intervalos 15 min (1 min trote ligero / 1 min caminata × 7).<br>
+      <b>Advertencia:</b> Las agujetas serán máximas. Duerme bien, proteína alta, hidratación.
     </div>
   </div>
 
-  <div class="section-title">Lunes — Upper 1 (Fallo / RIR 1)</div>
-  <div class="workout-block" id="u1w3">
-    <div class="workout-block-header" onclick="toggleBlock('u1w3')">
-      <span class="wb-title">Upper 1 · Semana de máxima intensidad</span>
+  <div class="section-title">Lunes — Tren Sup. Día 1 (Fallo / RIR 1)</div>
+  <div class="workout-block" id="sup1w3">
+    <div class="workout-block-header" onclick="toggleBlock('sup1w3')">
+      <span class="wb-title">Tren Superior Día 1 · Semana de máxima intensidad</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12, 150x10</td><td class="sets-cell">150x10x10 (o +)</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Última rep no puedes más</td></tr>
-          <tr><td>2</td><td class="exercise-name">Press Máq. Pecho</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115-145x6-8</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 rep antes fallo</td></tr>
-          <tr><td>3</td><td class="exercise-name">Jalón cerrado</td><td class="weight-cell">75x10, 90x10, 110x10</td><td class="sets-cell">110-120x8 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Espalda compuesto, RIR 1</td></tr>
-          <tr><td>4</td><td class="exercise-name">Press Militar</td><td class="weight-cell">D45x12, 55x12</td><td class="sets-cell">55-70x9 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Hombro compuesto, RIR 1</td></tr>
-          <tr><td>5</td><td class="exercise-name">Elevación frontal polea baja</td><td class="weight-cell">—</td><td class="sets-cell">25-35x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, al límite</td></tr>
-          <tr><td>6</td><td class="exercise-name">Predicador Máq.</td><td class="weight-cell">50x12, 65x10, 85x10</td><td class="sets-cell">90-105x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Bíceps al fallo total</td></tr>
-          <tr><td>7</td><td class="exercise-name">Curl Z polea</td><td class="weight-cell">—</td><td class="sets-cell">25-40x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Segundo bíceps, fallo</td></tr>
-          <tr><td>8</td><td class="exercise-name">Fondos Máq.</td><td class="weight-cell">—</td><td class="sets-cell">140-160x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Tríceps al límite</td></tr>
-          <tr><td>9</td><td class="exercise-name">Encogimientos Manc.</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · 2x10 fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Trapecio al fallo</td></tr>
+          <tr><td>1</td><td class="exercise-name">Press Pec. Máq.</td><td class="weight-cell">75x12, 115x10</td><td class="sets-cell">115x6-8 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 rep antes del fallo</td></tr>
+          <tr><td>2</td><td class="exercise-name">Remo Máq. Discos (1 mano)</td><td class="weight-cell">80x10, 115x10</td><td class="sets-cell">115x hasta fallo · 1 serie</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, al límite</td></tr>
+          <tr><td>3</td><td class="exercise-name">Peck Deck</td><td class="weight-cell">70x12, 100x12, 150x10</td><td class="sets-cell">150x hasta fallo · 2 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, fallo total</td></tr>
+          <tr><td>4</td><td class="exercise-name">Jalón agarre cerrado</td><td class="weight-cell">75x10, 90x10, 110x9</td><td class="sets-cell">110-120x8 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, RIR 1</td></tr>
+          <tr><td>5</td><td class="exercise-name">Shoulder Lat Rise</td><td class="weight-cell">40x10, 55x10</td><td class="sets-cell">65x hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, deltoides al límite</td></tr>
+          <tr><td>6</td><td class="exercise-name">Predicador Inverso</td><td class="weight-cell">55x10, 90x10</td><td class="sets-cell">95x hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Bíceps al fallo total</td></tr>
+          <tr><td>7</td><td class="exercise-name">Predicador Máquina</td><td class="weight-cell">50x12, 65x10, 85x10</td><td class="sets-cell">90x hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Segundo bíceps, fallo</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="section-title">Martes — Lower 1 (Fallo / RIR 1)</div>
-  <div class="workout-block" id="l1w3">
-    <div class="workout-block-header" onclick="toggleBlock('l1w3')">
-      <span class="wb-title">Lower 1 · Semana de máxima intensidad</span>
+  <div class="section-title">Martes — Tren Inf. Día 1 (Fallo / RIR 1)</div>
+  <div class="workout-block" id="inf1w3">
+    <div class="workout-block-header" onclick="toggleBlock('inf1w3')">
+      <span class="wb-title">Tren Inferior Día 1 · Semana de máxima intensidad</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Serie efectiva</th><th>Intensidad</th><th>Nota</th></tr></thead>
+        <thead><tr><th>#</th><th>Ejercicio</th><th>Calentamiento</th><th>Series efectivas</th><th>Intensidad</th><th>Nota</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td class="exercise-name">Curl acostado femoral</td><td class="weight-cell">70x12, 90x12, 110x10</td><td class="sets-cell">110-125x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Fallo completo en femoral</td></tr>
-          <tr><td>2</td><td class="exercise-name">Curl sentado</td><td class="weight-cell">70x10, 100x9</td><td class="sets-cell">100-115x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Segundo fallo femoral</td></tr>
-          <tr><td>3</td><td class="exercise-name">Extensiones</td><td class="weight-cell">85x15, 100x12, 140x12</td><td class="sets-cell">145-160x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Quad aislamiento, fallo</td></tr>
-          <tr><td>4</td><td class="exercise-name">Sentadilla Hack o Perfecta</td><td class="weight-cell">Peso sem 2</td><td class="sets-cell">+5% sem 2 · 2 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 antes fallo</td></tr>
-          <tr><td>5</td><td class="exercise-name">Adductores máq.</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 2 · fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, fallo total</td></tr>
-          <tr><td>6</td><td class="exercise-name">Puente glúteo</td><td class="weight-cell">—</td><td class="sets-cell">+5% sem 2 · fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Glúteo al límite</td></tr>
-          <tr><td>7</td><td class="exercise-name">Press pantorrilla</td><td class="weight-cell">235x10, 250x10</td><td class="sets-cell">250-270x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Pantorrilla aguanta mucho</td></tr>
-          <tr><td>8</td><td class="exercise-name">Costurera</td><td class="weight-cell">—</td><td class="sets-cell">150-175x hasta fallo</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Fallo en costurera</td></tr>
+          <tr><td>1</td><td class="exercise-name">Extensiones (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · hasta fallo · 1 serie</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Quad aislamiento, fallo</td></tr>
+          <tr><td>2</td><td class="exercise-name">Hip Thrust</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · hasta fallo · 4 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Glúteo al límite</td></tr>
+          <tr><td>3</td><td class="exercise-name">Press Piernas Máq.</td><td class="weight-cell">145x15, 175x12, 220x12</td><td class="sets-cell">225x8-10 · 3 series</td><td><span class="target-cell target-rir1">RIR 1</span></td><td class="note-cell">Compuesto, 1 rep antes del fallo</td></tr>
+          <tr><td>4</td><td class="exercise-name">Curl Sentado</td><td class="weight-cell">70x10, 100x9</td><td class="sets-cell">100x hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Femoral aislamiento, fallo total</td></tr>
+          <tr><td>5</td><td class="exercise-name">Pantorrilla en Press (unilateral)</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Pantorrilla aguanta mucho</td></tr>
+          <tr><td>6</td><td class="exercise-name">Curl Acostado</td><td class="weight-cell">70x12, 90x12, 110x10</td><td class="sets-cell">110x hasta fallo · 1 serie</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Fallo completo en femoral</td></tr>
+          <tr><td>7</td><td class="exercise-name">Adductores Máq.</td><td class="weight-cell">—</td><td class="sets-cell">Peso sem 2 · hasta fallo · 3 series</td><td><span class="target-cell target-fallo">FALLO</span></td><td class="note-cell">Aislamiento, fallo total</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="section-title">Jueves — Upper 2 &nbsp;/&nbsp; Viernes — Lower 2</div>
+  <div class="section-title">Jueves — Sup 2 &nbsp;/&nbsp; Viernes — Inf 2</div>
   <div class="progression-box blue">
-    <div class="pb-title">Upper 2 y Lower 2 — Sem 3</div>
+    <div class="pb-title">Tren Sup 2 y Tren Inf 2 — Sem 3</div>
     <div class="pb-items">
-      Misma lógica: <b>aislamientos al fallo</b> (elevaciones laterales, curl acostado, costurera, abductores, peck deck reverso, predicador).<br>
-      <b>Compuestos al RIR 1</b> (dominadas, remo, press pecho, fondos, sentadilla, press pantorrilla).<br>
-      El cardio esta semana: <b>intervalos 15 min</b> — 1 min a ritmo ligero de trote / 1 min caminata x7 repeticiones.<br>
+      Misma lógica: <b>aislamientos al fallo</b> (peck deck, curl sent., curl acostado, patada glúteo, abductores, peck deck reverso, bíceps curl, fondos).<br>
+      <b>Compuestos al RIR 1</b> (shoulder press, remo, press piernas 1 serie).<br>
+      Cardio esta semana: <b>intervalos 15 min</b> — 1 min trote ligero / 1 min caminata × 7 repeticiones.<br>
       <b>Recuperación crítica:</b> duerme 7-8 h, hidratación alta, proteína ~1.8-2g/kg.
     </div>
   </div>
@@ -896,43 +983,45 @@
   <div class="progression-box purple">
     <div class="pb-title">🎯 Estrategia semana 4 — Descarga</div>
     <div class="pb-items">
-      <b>Cargas:</b> 55-60% del peso que usaste en sem 3 (ej. si hiciste 150 en sem 3, usa 85-90 esta semana)<br>
-      <b>Series:</b> Solo 1 serie por ejercicio · La mitad del volumen total<br>
-      <b>Reps:</b> 8-10 reps con mucho margen (RIR 4-5) — nunca llegas al fallo<br>
-      <b>Objetivo:</b> Sentirte fresco, mover sangre a los músculos, reducir inflamación acumulada<br>
-      <b>Cardio:</b> Caminata suave 10-12 min a ritmo muy cómodo — sin esfuerzo cardiovascular alto<br>
-      <b>Mentalidad:</b> Esta semana parece "fácil" pero es donde el músculo realmente crece y se adapta
+      <b>Cargas:</b> 55-60% del peso de sem 3. Ej: si hiciste 225 en press piernas, usa 135-140 esta semana.<br>
+      <b>Series:</b> Solo 1 serie por ejercicio · La mitad del volumen total.<br>
+      <b>Reps:</b> 8-10 reps con mucho margen (RIR 4-5) — nunca llegas al fallo.<br>
+      <b>Objetivo:</b> Sentirte fresco, mover sangre a los músculos, reducir inflamación.<br>
+      <b>Cardio:</b> Caminata suave 10-12 min — sin esfuerzo cardiovascular alto.<br>
+      <b>Mentalidad:</b> Esta semana parece "fácil" pero es donde el músculo realmente crece y se adapta.
     </div>
   </div>
 
   <div class="section-title">Estructura de descarga — todas las sesiones</div>
   <div class="workout-block" id="desc_all">
     <div class="workout-block-header" onclick="toggleBlock('desc_all')">
-      <span class="wb-title">Upper 1 / Lower 1 / Upper 2 / Lower 2 — Versión Descarga</span>
+      <span class="wb-title">Sup 1 / Inf 1 / Sup 2 / Inf 2 — Versión Descarga</span>
       <span class="wb-chevron">▼</span>
     </div>
     <div class="workout-table-wrap">
       <table>
         <thead><tr><th>Sesión</th><th>Ejercicio</th><th>Peso descarga</th><th>Series × Reps</th><th>Intensidad</th></tr></thead>
         <tbody>
-          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Upper 1<br>(Lunes)</td>
-              <td>Peck Deck</td><td class="weight-cell">~90x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Press Máq. Pecho</td><td class="weight-cell">~70x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Jalón cerrado</td><td class="weight-cell">~65x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Predicador + Fondos</td><td class="weight-cell">~55% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Lower 1<br>(Martes)</td>
-              <td>Curl acostado + sentado</td><td class="weight-cell">~65-70% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Extensiones</td><td class="weight-cell">~85x12</td><td>1×12</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Sentadilla Hack</td><td class="weight-cell">~60% sem3</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Puente glúteo + Costurera</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td rowspan="3" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Upper 2<br>(Jueves)</td>
-              <td>Dominadas + Remo</td><td class="weight-cell">-70x8 / 65x10</td><td>1×8 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Elev. lateral + Peck Deck Reverso</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Predicador + Predicador Inv.</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td rowspan="3" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Lower 2<br>(Viernes)</td>
-              <td>Extensiones + Press Hor.</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Curl acostado + sentado</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
-          <tr><td>Puente glúteo + Costurera + Abductores</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="5" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Sup 1<br>(Lunes)</td>
+              <td>Press Pec. Máq.</td><td class="weight-cell">~70x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Peck Deck</td><td class="weight-cell">~90x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Jalón agarre cerrado</td><td class="weight-cell">~65x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Shoulder Lat Rise</td><td class="weight-cell">~40x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Predicador Máq. + Inverso</td><td class="weight-cell">~55% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Inf 1<br>(Martes)</td>
+              <td>Extensiones unilateral</td><td class="weight-cell">~60% sem3</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Hip Thrust</td><td class="weight-cell">~60% sem3</td><td>2×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Press Piernas Máq.</td><td class="weight-cell">~135x12</td><td>1×12</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Curl Sent. + Curl Acostado</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="4" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent3);font-size:14px;">Sup 2<br>(Jueves)</td>
+              <td>Peck Deck + Peck Deck Rev.</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Remo (codo pegado)</td><td class="weight-cell">~60% sem3</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Shoulder Press</td><td class="weight-cell">~D45x10</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Fondos Máq. + Bíceps Curl</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td rowspan="3" style="font-family:'Barlow Condensed';font-weight:700;color:var(--accent2);font-size:14px;">Inf 2<br>(Viernes)</td>
+              <td>Extensiones unilateral + Patada Glúteo</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Curl Sentado + Curl Acostado</td><td class="weight-cell">~60% sem3</td><td>1×10 c/u</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
+          <tr><td>Abductores Máq.</td><td class="weight-cell">~60% sem3</td><td>1×10</td><td><span class="target-cell target-descarga">RIR 4</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -953,10 +1042,10 @@
     <div class="pb-title">Inicio del Mes 2 — Cómo progresar</div>
     <div class="pb-items">
       Al terminar sem 4, tu cuerpo estará completamente recuperado y súper-compensado.<br>
-      <b>Mes 2:</b> Repite la misma estructura de 4 semanas, pero con estas progresiones:<br>
-      · <b>Ejercicios donde llegaste bien al fallo:</b> Sube 5 kg (máq.) o 2.5 kg (mancuernas)<br>
-      · <b>Ejercicios donde no llegaste al objetivo (paréntesis):</b> Mantén el peso, trabaja en técnica<br>
-      · <b>Cardio mes 2:</b> Sube a 20 min, o añade un 5° día de cardio solo (30-40 min caminata/bici)
+      <b>Mes 2:</b> Repite la misma estructura de 4 semanas, con estas progresiones:<br>
+      · <b>Ejercicios donde llegaste bien al fallo:</b> Sube 5 kg en máquinas o 2.5 kg en mancuernas.<br>
+      · <b>Ejercicios donde no llegaste al objetivo:</b> Mantén el peso y trabaja la técnica.<br>
+      · <b>Cardio mes 2:</b> Sube a 20 min, o añade un 5° día de cardio solo (30-40 min caminata/bici).
     </div>
   </div>
 </div>
@@ -970,7 +1059,6 @@
     </div>
   </div>
 
-  <!-- LOG FORM -->
   <div class="tracker-form" id="trackerForm">
     <div class="tf-row">
       <div class="tf-group">
@@ -985,10 +1073,10 @@
       <div class="tf-group">
         <label class="tf-label">Sesión</label>
         <select id="tf-session" class="tf-input">
-          <option value="Upper 1">Upper 1 (Lunes)</option>
-          <option value="Lower 1">Lower 1 (Martes)</option>
-          <option value="Upper 2">Upper 2 (Jueves)</option>
-          <option value="Lower 2">Lower 2 (Viernes)</option>
+          <option value="Sup 1">Sup 1 (Lunes)</option>
+          <option value="Inf 1">Inf 1 (Martes)</option>
+          <option value="Sup 2">Sup 2 (Jueves)</option>
+          <option value="Inf 2">Inf 2 (Viernes)</option>
         </select>
       </div>
       <div class="tf-group">
@@ -1001,48 +1089,42 @@
       <div class="tf-group" style="flex:2">
         <label class="tf-label">Ejercicio</label>
         <select id="tf-exercise" class="tf-input">
-          <optgroup label="Upper 1">
-            <option>Peck Deck</option>
-            <option>Press Máq. Pecho</option>
-            <option>Jalón al pecho cerrado</option>
-            <option>Press Militar (máq.)</option>
-            <option>Elevación frontal polea baja</option>
-            <option>Predicador Máq.</option>
-            <option>Curl Z polea</option>
-            <option>Fondos Máq.</option>
-            <option>Encogimientos Manc.</option>
-          </optgroup>
-          <optgroup label="Lower 1">
-            <option>Curl acostado femoral</option>
-            <option>Curl sentado</option>
-            <option>Extensiones (quad)</option>
-            <option>Sentadilla Hack / Perfecta</option>
-            <option>Adductores máq.</option>
-            <option>Puente glúteo</option>
-            <option>Press pantorrilla</option>
-            <option>Costurera</option>
-          </optgroup>
-          <optgroup label="Upper 2">
-            <option>Dominadas (asistidas)</option>
-            <option>Remo máq. discos</option>
-            <option>Press pecho máq. (U2)</option>
-            <option>Elevación lateral máq.</option>
-            <option>Fondos máq. (U2)</option>
-            <option>Elevación frontal polea (U2)</option>
-            <option>Espalda baja en banco</option>
-            <option>Peck Deck Reverso</option>
+          <optgroup label="Tren Sup. Día 1">
+            <option>Press Pec. Máq.</option>
+            <option>Remo Máq. Discos (1 mano)</option>
+            <option>Peck Deck (Sup 1)</option>
+            <option>Jalón agarre cerrado</option>
+            <option>Shoulder Lat Rise</option>
             <option>Predicador Inverso</option>
-            <option>Predicador Máq. (U2)</option>
+            <option>Predicador Máquina</option>
           </optgroup>
-          <optgroup label="Lower 2">
-            <option>Extensiones L2</option>
-            <option>Press Horizontal (femoral)</option>
-            <option>Curl acostado L2</option>
-            <option>Curl sentado L2</option>
-            <option>Puente glúteo L2</option>
-            <option>Press pantorrilla L2</option>
-            <option>Costurera L2</option>
-            <option>Abductores máq.</option>
+          <optgroup label="Tren Inf. Día 1">
+            <option>Extensiones unilateral (Inf 1)</option>
+            <option>Hip Thrust</option>
+            <option>Press Piernas Máq. (Inf 1)</option>
+            <option>Curl Sentado (Inf 1)</option>
+            <option>Pantorrilla en Press unilateral (Inf 1)</option>
+            <option>Curl Acostado (Inf 1)</option>
+            <option>Adductores Máq.</option>
+          </optgroup>
+          <optgroup label="Tren Sup. Día 2">
+            <option>Peck Deck (Sup 2)</option>
+            <option>Remo Máq./Polea codo pegado</option>
+            <option>Shoulder Press</option>
+            <option>Remo Abierto</option>
+            <option>Fondos Máq.</option>
+            <option>Bíceps Curl Máq. / Curl Polea Z</option>
+            <option>Press Pecho Alto</option>
+            <option>Peck Deck Reverso</option>
+          </optgroup>
+          <optgroup label="Tren Inf. Día 2">
+            <option>Extensiones unilateral (Inf 2)</option>
+            <option>Curl Sentado (Inf 2)</option>
+            <option>Patada Glúteo</option>
+            <option>Press Piernas Máq. (Inf 2)</option>
+            <option>Pantorrilla en Press unilateral (Inf 2)</option>
+            <option>Curl Acostado (Inf 2)</option>
+            <option>Abductores Máq.</option>
           </optgroup>
         </select>
       </div>
@@ -1079,7 +1161,6 @@
     </div>
   </div>
 
-  <!-- FILTER BAR -->
   <div class="section-title" style="margin-top:28px">Historial</div>
   <div class="filter-bar">
     <select id="filter-week" class="tf-input tf-input-sm" onchange="renderLog()">
@@ -1091,10 +1172,10 @@
     </select>
     <select id="filter-session" class="tf-input tf-input-sm" onchange="renderLog()">
       <option value="">Todas las sesiones</option>
-      <option value="Upper 1">Upper 1</option>
-      <option value="Lower 1">Lower 1</option>
-      <option value="Upper 2">Upper 2</option>
-      <option value="Lower 2">Lower 2</option>
+      <option value="Sup 1">Sup 1</option>
+      <option value="Inf 1">Inf 1</option>
+      <option value="Sup 2">Sup 2</option>
+      <option value="Inf 2">Inf 2</option>
     </select>
     <select id="filter-exercise" class="tf-input tf-input-sm" onchange="renderLog()">
       <option value="">Todos los ejercicios</option>
@@ -1109,15 +1190,7 @@
       <table id="log-table">
         <thead>
           <tr>
-            <th>Fecha</th>
-            <th>Sem</th>
-            <th>Sesión</th>
-            <th>Ejercicio</th>
-            <th>Peso</th>
-            <th>Reps</th>
-            <th>Intensidad</th>
-            <th>Nota</th>
-            <th></th>
+            <th>Fecha</th><th>Sem</th><th>Sesión</th><th>Ejercicio</th><th>Peso</th><th>Reps</th><th>Intensidad</th><th>Nota</th><th></th>
           </tr>
         </thead>
         <tbody id="log-tbody"></tbody>
@@ -1125,7 +1198,6 @@
     </div>
   </div>
 
-  <!-- PROGRESS SUMMARY -->
   <div class="section-title" style="margin-top:28px">Progresión por ejercicio</div>
   <div id="progress-summary">
     <div class="log-empty">Los datos de progresión aparecerán aquí una vez tengas registros.</div>
@@ -1134,127 +1206,16 @@
 
 </main>
 
-<style>
-  /* TRACKER STYLES */
-  .tracker-form {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .tf-row { display: flex; gap: 12px; flex-wrap: wrap; }
-  .tf-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
-  .tf-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .tf-input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    color: var(--text);
-    padding: 8px 10px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.15s;
-    width: 100%;
-  }
-  .tf-input:focus { border-color: var(--accent); }
-  .tf-input-sm { padding: 6px 8px; font-size: 12px; }
-  select.tf-input option { background: var(--surface); }
-  .tf-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .tf-btn {
-    padding: 9px 18px;
-    border-radius: 5px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.15s;
-  }
-  .tf-btn-primary { background: var(--accent); color: #0d0f14; }
-  .tf-btn-primary:hover { background: #d4ea2e; }
-  .tf-btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-  .tf-btn-ghost:hover { border-color: var(--accent3); color: var(--accent3); }
-  .tf-btn-danger { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
-  .tf-btn-danger:hover { background: rgba(255,71,87,0.2); }
-  .tf-feedback { font-size: 12px; color: var(--success); font-weight: 500; }
-
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-    align-items: center;
-  }
-  .filter-bar .tf-input { max-width: 160px; flex: none; }
-
-  .log-empty {
-    color: var(--muted);
-    font-size: 13px;
-    text-align: center;
-    padding: 32px;
-    background: var(--card);
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-  }
-  .log-table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
-  #log-table { min-width: 700px; }
-  .delete-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 14px;
-    padding: 2px 6px;
-    border-radius: 3px;
-    transition: color 0.15s;
-  }
-  .delete-btn:hover { color: var(--danger); }
-
-  /* PROGRESS CARDS */
-  .progress-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-  .progress-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-  }
-  .pc-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:8px; }
-  .pc-weeks { display:flex; flex-direction:column; gap:4px; }
-  .pc-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; }
-  .pc-week-label { color:var(--muted); font-family:'Barlow Condensed',sans-serif; letter-spacing:0.5px; }
-  .pc-val { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; }
-  .pc-arrow { font-size:10px; color:var(--success); margin-left:4px; }
-  .pc-arrow.down { color:var(--w4); }
-</style>
-
 <script>
-  // ---- STORAGE KEY ----
-  const STORAGE_KEY = 'gym-log-v1';
+  const STORAGE_KEY = 'gym-log-v2';
 
-  // ---- LOAD / SAVE ----
   function loadEntries() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
   }
   function saveEntries(arr) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch(e) { console.warn(e); }
   }
 
-  // ---- INIT DATE ----
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tf-date').value = new Date().toISOString().split('T')[0];
     populateExerciseFilter();
@@ -1262,30 +1223,19 @@
     renderProgress();
   });
 
-  // ---- SAVE ENTRY ----
   function saveEntry() {
-    const week     = document.getElementById('tf-week').value;
-    const session  = document.getElementById('tf-session').value;
-    const date     = document.getElementById('tf-date').value;
-    const exercise = document.getElementById('tf-exercise').value;
-    const weight   = document.getElementById('tf-weight').value;
-    const reps     = document.getElementById('tf-reps').value;
-    const intensity= document.getElementById('tf-intensity').value;
-    const note     = document.getElementById('tf-note').value.trim();
+    const week      = document.getElementById('tf-week').value;
+    const session   = document.getElementById('tf-session').value;
+    const date      = document.getElementById('tf-date').value;
+    const exercise  = document.getElementById('tf-exercise').value;
+    const weight    = document.getElementById('tf-weight').value;
+    const reps      = document.getElementById('tf-reps').value;
+    const intensity = document.getElementById('tf-intensity').value;
+    const note      = document.getElementById('tf-note').value.trim();
 
-    if (!weight || !reps) {
-      showFeedback('⚠ Ingresa peso y reps', 'var(--accent2)');
-      return;
-    }
+    if (!weight || !reps) { showFeedback('⚠ Ingresa peso y reps', 'var(--accent2)'); return; }
 
-    const entry = {
-      id: Date.now(),
-      date, week, session, exercise,
-      weight: parseFloat(weight),
-      reps: parseInt(reps),
-      intensity, note
-    };
-
+    const entry = { id: Date.now(), date, week, session, exercise, weight: parseFloat(weight), reps: parseInt(reps), intensity, note };
     const entries = loadEntries();
     entries.unshift(entry);
     saveEntries(entries);
@@ -1307,28 +1257,18 @@
     setTimeout(() => el.textContent = '', 2000);
   }
 
-  // ---- RENDER LOG ----
   function renderLog() {
     const entries = loadEntries();
     const fw = document.getElementById('filter-week').value;
     const fs = document.getElementById('filter-session').value;
     const fe = document.getElementById('filter-exercise').value;
-
-    let filtered = entries.filter(e =>
-      (!fw || e.week == fw) &&
-      (!fs || e.session === fs) &&
-      (!fe || e.exercise === fe)
-    );
+    let filtered = entries.filter(e => (!fw || e.week == fw) && (!fs || e.session === fs) && (!fe || e.exercise === fe));
 
     const tbody = document.getElementById('log-tbody');
     const empty = document.getElementById('log-empty');
     const wrap  = document.getElementById('log-table-wrap');
 
-    if (filtered.length === 0) {
-      empty.style.display = 'block';
-      wrap.style.display = 'none';
-      return;
-    }
+    if (filtered.length === 0) { empty.style.display = 'block'; wrap.style.display = 'none'; return; }
     empty.style.display = 'none';
     wrap.style.display = 'block';
 
@@ -1338,7 +1278,7 @@
     tbody.innerHTML = filtered.map(e => `
       <tr>
         <td>${e.date || '—'}</td>
-        <td><span style="font-family:'Barlow Condensed';font-weight:700;color:${wColors[e.week] || 'var(--text)'}">S${e.week}</span></td>
+        <td><span style="font-family:'Barlow Condensed';font-weight:700;color:${wColors[e.week]||'var(--text)'}">S${e.week}</span></td>
         <td style="font-size:12px;color:var(--muted)">${e.session}</td>
         <td class="exercise-name">${e.exercise}</td>
         <td class="weight-cell">${e.weight} kg</td>
@@ -1350,23 +1290,17 @@
     `).join('');
   }
 
-  // ---- DELETE ----
   function deleteEntry(id) {
     if (!confirm('¿Borrar este registro?')) return;
-    const entries = loadEntries().filter(e => e.id !== id);
-    saveEntries(entries);
-    renderLog();
-    renderProgress();
+    saveEntries(loadEntries().filter(e => e.id !== id));
+    renderLog(); renderProgress();
   }
 
   function clearAll() {
     if (!confirm('¿Borrar TODOS los registros? Esta acción no se puede deshacer.')) return;
-    saveEntries([]);
-    renderLog();
-    renderProgress();
+    saveEntries([]); renderLog(); renderProgress();
   }
 
-  // ---- POPULATE EXERCISE FILTER ----
   function populateExerciseFilter() {
     const entries = loadEntries();
     const exercises = [...new Set(entries.map(e => e.exercise))].sort();
@@ -1376,7 +1310,6 @@
       exercises.map(ex => `<option value="${ex}" ${ex===cur?'selected':''}>${ex}</option>`).join('');
   }
 
-  // ---- PROGRESS SUMMARY ----
   function renderProgress() {
     const entries = loadEntries();
     const container = document.getElementById('progress-summary');
@@ -1384,8 +1317,6 @@
       container.innerHTML = '<div class="log-empty">Los datos de progresión aparecerán aquí una vez tengas registros.</div>';
       return;
     }
-
-    // Group by exercise → by week → max weight
     const map = {};
     entries.forEach(e => {
       if (!map[e.exercise]) map[e.exercise] = {};
@@ -1394,10 +1325,8 @@
         map[e.exercise][w] = { weight: e.weight, reps: e.reps };
       }
     });
-
     const wOrder = ['S1','S2','S3','S4'];
     const wColors = { 'S1':'var(--w1)', 'S2':'var(--w2)', 'S3':'var(--w3)', 'S4':'var(--w4)' };
-
     const cards = Object.entries(map).map(([exercise, weeks]) => {
       const rows = wOrder.filter(w => weeks[w]).map((w, i, arr) => {
         const prev = i > 0 ? weeks[arr[i-1]]?.weight : null;
@@ -1406,26 +1335,15 @@
         if (prev !== null) {
           arrow = cur > prev
             ? `<span class="pc-arrow">▲ +${(cur-prev).toFixed(1)}</span>`
-            : cur < prev
-              ? `<span class="pc-arrow down">▼ ${(cur-prev).toFixed(1)}</span>`
-              : '';
+            : cur < prev ? `<span class="pc-arrow down">▼ ${(cur-prev).toFixed(1)}</span>` : '';
         }
-        return `<div class="pc-row">
-          <span class="pc-week-label" style="color:${wColors[w]}">${w}</span>
-          <span class="pc-val">${cur} kg × ${weeks[w].reps} reps ${arrow}</span>
-        </div>`;
+        return `<div class="pc-row"><span class="pc-week-label" style="color:${wColors[w]}">${w}</span><span class="pc-val">${cur} kg × ${weeks[w].reps} reps ${arrow}</span></div>`;
       }).join('');
-
-      return `<div class="progress-card">
-        <div class="pc-name">${exercise}</div>
-        <div class="pc-weeks">${rows}</div>
-      </div>`;
+      return `<div class="progress-card"><div class="pc-name">${exercise}</div><div class="pc-weeks">${rows}</div></div>`;
     }).join('');
-
     container.innerHTML = `<div class="progress-grid">${cards}</div>`;
   }
 
-  // ---- EXPORT CSV ----
   function exportCSV() {
     const entries = loadEntries();
     if (entries.length === 0) { alert('No hay registros para exportar.'); return; }
@@ -1437,11 +1355,10 @@
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'registro_gym.csv';
+    a.download = 'registro_gym_v2.csv';
     a.click();
   }
 
-  // ---- NAV ----
   function showWeek(n) {
     document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
